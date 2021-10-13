@@ -1,10 +1,12 @@
 package pl.com.seremak.simplebills.model;
 
+import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Document
+@Builder
 public class Bill {
 
     @Id
