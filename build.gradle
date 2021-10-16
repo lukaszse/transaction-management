@@ -40,9 +40,7 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mongodb'
-	implementation "org.codehaus.groovy:groovy:3.0.8"
-	testImplementation platform("org.spockframework:spock-bom:2.0-groovy-3.0")
-	testImplementation "org.spockframework:spock-core"
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 }
 
 dependencyManagement {
