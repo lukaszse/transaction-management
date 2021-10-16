@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.model;
+package pl.com.seremak.simplebills.model.bill;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

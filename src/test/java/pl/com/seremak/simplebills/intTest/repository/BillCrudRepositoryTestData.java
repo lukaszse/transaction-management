@@ -1,6 +1,6 @@
 package pl.com.seremak.simplebills.intTest.repository;
 
-import pl.com.seremak.simplebills.model.Bill;
+import pl.com.seremak.simplebills.model.bill.Bill;
 
 public class BillCrudRepositoryTestData {
 

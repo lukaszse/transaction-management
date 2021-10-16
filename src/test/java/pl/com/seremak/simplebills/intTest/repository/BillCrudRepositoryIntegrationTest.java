@@ -1,19 +1,16 @@
 package pl.com.seremak.simplebills.intTest.repository;
 
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import pl.com.seremak.simplebills.model.Bill;
+import pl.com.seremak.simplebills.model.bill.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

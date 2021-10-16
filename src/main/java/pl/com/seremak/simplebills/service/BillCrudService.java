@@ -3,7 +3,7 @@ package pl.com.seremak.simplebills.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.model.Bill;
+import pl.com.seremak.simplebills.model.bill.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.service.util.OperationType;
 import reactor.core.publisher.Mono;

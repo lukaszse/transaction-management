@@ -14,7 +14,7 @@ import org.springframework.lang.NonNull;
 @EnableReactiveMongoRepositories(basePackages = "pl.com.seremak.simplebills.repository")
 public class MongoReactiveConfig extends AbstractReactiveMongoConfiguration {
 
-    @Value("${spring.data.mongodb.database:simple-bills_fallback}")
+    @Value("${spring.data.mongodb.database}")
     private String simpleBillDatabase;
 
     @Bean
