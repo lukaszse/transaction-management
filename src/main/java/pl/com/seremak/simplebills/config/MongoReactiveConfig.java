@@ -2,6 +2,7 @@ package pl.com.seremak.simplebills.config;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,8 @@ import org.springframework.lang.NonNull;
 @EnableReactiveMongoRepositories(basePackages = "pl.com.seremak.simplebills.repository")
 public class MongoReactiveConfig extends AbstractReactiveMongoConfiguration {
 
-    public static final String SIMPLE_BILL_MONGO_DATABASE = "SimpleBill";
+    @Value("${spring.data.mongodb.database:simple-bills_fallback}")
+    private String simpleBillDatabase;
 
     @Bean
     public MongoClient mongoClient() {
@@ -23,6 +25,6 @@ public class MongoReactiveConfig extends AbstractReactiveMongoConfiguration {
     @NonNull
     @Override
     protected String getDatabaseName() {
-        return SIMPLE_BILL_MONGO_DATABASE;
+        return simpleBillDatabase;
     }
 }

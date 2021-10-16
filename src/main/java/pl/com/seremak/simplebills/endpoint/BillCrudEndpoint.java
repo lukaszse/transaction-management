@@ -1,6 +1,8 @@
 package pl.com.seremak.simplebills.endpoint;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.model.Bill;
@@ -16,8 +18,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BillCrudEndpoint {
 
+    @Value("${hello}")
+    private String hello;
     private final BillCrudService service;
 
+
+    @GetMapping("/hello")
+    public Mono<ResponseEntity<String>> sayHello() {
+        return Mono.just(hello)
+                .map(ResponseEntity::ok);
+    }
 
     @PostMapping
     public Mono<ResponseEntity<String>> createBill(final Bill bill) {
