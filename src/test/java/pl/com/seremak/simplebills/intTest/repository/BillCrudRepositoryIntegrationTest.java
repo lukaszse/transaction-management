@@ -39,7 +39,7 @@ public class BillCrudRepositoryIntegrationTest {
                 .description("desc")
                 .build()).block();
 
-        String desc = Objects.requireNonNull(repository.findAll().blockFirst()).description;
+        String desc = Objects.requireNonNull(repository.findAll().blockFirst()).getDescription();
         assertEquals("desc", desc);
     }
 }

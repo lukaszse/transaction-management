@@ -20,6 +20,7 @@ public class BillCrudService {
     public static final String OPERATION_ERROR_MESSAGE = "Cannot {} Bill with id={}. Error={}";
     public static final String OPERATION_ERROR_MESSAGE_CATEGORY = "Cannot {} Bills with category={}. Error={}";
     public static final String OPERATION_ERROR_MESSAGE_ALL = "Cannot {} Bills. Error={}";
+
     private final BillCrudRepository billCrudRepository;
 
     public Mono<Bill> findBillById(final String id) {

@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +22,7 @@ public class CrudRepositoryIntegrationTest {
     @Test
     public void shouldGetAppropriateNumberOfBills() {
 
-        Bill bill = new Bill(1, "opis", "kategoria");
+        Bill bill = new Bill(1, Instant.now(), "opis", "kategoria", null);
         var insert = repository.save(bill).block();
         long count = Optional.ofNullable(repository.count().block()).orElse(0L);
 
