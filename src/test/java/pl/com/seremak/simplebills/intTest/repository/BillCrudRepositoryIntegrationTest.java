@@ -7,11 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static pl.com.seremak.simplebills.intTest.repository.BillCrudRepositoryTestData.*;
 
 @DataMongoTest
 public class BillCrudRepositoryIntegrationTest {
@@ -20,26 +26,42 @@ public class BillCrudRepositoryIntegrationTest {
     BillCrudRepository repository;
 
     @Test
-    public void countDocuments() {
+    public void fetchDocument() {
 
-        repository.save(Bill.builder()
-                .id("33")
-                .description("descddd")
-                .build()).block();
+        // given
+        repository.save(prepareBill("2")).block();
 
-        long count = Optional.ofNullable(repository.count().block()).orElse(0L);
-        assertEquals(count, 1L);
+        // when
+        Mono<Bill> monoBill = repository.findById("2");
+
+        // then
+        StepVerifier
+                .create(monoBill)
+                .assertNext(bill -> {
+                    assertEquals(GROCERY_CATEGORY, bill.getCategory());
+                    assertEquals(BIEDRONKA_SHOPPING, bill.getDescription());
+                })
+                .expectComplete()
+                .verify();
     }
 
     @Test
-    public void fetchDocument() {
+    public void fetchAllDocuments() {
 
-        repository.save(Bill.builder()
-                .id("33")
-                .description("desc")
-                .build()).block();
+        // given
+        IntStream.range(11, 21)
+                .forEach(i -> repository.save(prepareBill(String.valueOf(i))).block());
 
-        String desc = Objects.requireNonNull(repository.findAll().blockFirst()).getDescription();
-        assertEquals("desc", desc);
+        // when
+        Flux<Bill> fluxBills = repository.findAll();
+        List<Bill> bills = repository.findAll().collectList().block();
+
+        // then
+        StepVerifier
+                .create(fluxBills)
+                .assertNext(bill -> assertEquals(GROCERY_CATEGORY, bill.getCategory()))
+                .expectNextCount(9)
+                .expectComplete()
+                .verify();
     }
 }
