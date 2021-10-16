@@ -23,7 +23,7 @@ public class BillCrudRepositoryIntegrationTest {
     public void countDocuments() {
 
         repository.save(Bill.builder()
-                .id(33)
+                .id("33")
                 .description("descddd")
                 .build()).block();
 
@@ -35,7 +35,7 @@ public class BillCrudRepositoryIntegrationTest {
     public void fetchDocument() {
 
         repository.save(Bill.builder()
-                .id(33)
+                .id("33")
                 .description("desc")
                 .build()).block();
 

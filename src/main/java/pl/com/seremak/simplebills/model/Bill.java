@@ -16,7 +16,7 @@ import java.time.Instant;
 public class Bill {
 
     @Id
-    private int id;
+    private String id;
     private Instant date;
     private String description;
     private String category;
