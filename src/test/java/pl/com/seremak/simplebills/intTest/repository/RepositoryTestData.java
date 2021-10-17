@@ -2,7 +2,7 @@ package pl.com.seremak.simplebills.intTest.repository;
 
 import pl.com.seremak.simplebills.model.bill.Bill;
 
-public class BillCrudRepositoryTestData {
+public class RepositoryTestData {
 
     public static final String BIEDRONKA_SHOPPING = "shoppoing in Biedronka";
     public static final String GROCERY_CATEGORY = "grocery";

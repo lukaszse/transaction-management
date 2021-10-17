@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static pl.com.seremak.simplebills.intTest.repository.BillCrudRepositoryTestData.*;
+import static pl.com.seremak.simplebills.intTest.repository.RepositoryTestData.*;
 
 @DataMongoTest
 public class BillCrudRepositoryIntegrationTest {
 
     @Autowired
-    BillCrudRepository repository;
+    public BillCrudRepository repository;
 
     @Test
     public void fetchDocument() {
