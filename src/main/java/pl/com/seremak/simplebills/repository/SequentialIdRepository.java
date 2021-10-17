@@ -20,7 +20,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class CounterRepository {
+public class SequentialIdRepository {
 
     private static final String SEQUENTIAL_ID_COLLECTION_NAME = "SequentialId";
     private static final String SEQUENTIAL_ID_FIELD = "seq";
