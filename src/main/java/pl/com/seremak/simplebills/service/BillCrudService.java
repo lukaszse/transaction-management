@@ -3,8 +3,9 @@ package pl.com.seremak.simplebills.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.model.Bill;
+import pl.com.seremak.simplebills.model.bill.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
+import pl.com.seremak.simplebills.repository.SequentialIdRepository;
 import pl.com.seremak.simplebills.service.util.OperationType;
 import reactor.core.publisher.Mono;
 
@@ -18,34 +19,45 @@ public class BillCrudService {
     public static final String OPERATION_ERROR_MESSAGE = "Cannot {} Bill with id={}. Error={}";
     public static final String OPERATION_ERROR_MESSAGE_CATEGORY = "Cannot {} Bills with category={}. Error={}";
     public static final String OPERATION_ERROR_MESSAGE_ALL = "Cannot {} Bills. Error={}";
+    public static final String DEFAULT_USER = "default_user";
 
-    private final BillCrudRepository repository;
+    private final BillCrudRepository crudRepository;
+    private final SequentialIdRepository sequentialIdRepository;
 
     public Mono<String> createBill(final Bill bill) {
-        return repository.save(bill)
-                .map(Bill::getId);
+        return sequentialIdRepository.generateId(DEFAULT_USER)
+                .map(id -> updateBillId(bill, id))
+                .map(theBill -> crudRepository.save(bill)
+                        .map(Bill::getId))
+                .flatMap(id -> id);
+
     }
 
     public Mono<Bill> findBillById(final String id) {
-        return repository.findById(id)
+        return crudRepository.findById(id)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, id, error.getMessage()));
     }
 
     public Mono<List<Bill>> findAllBills() {
-        return repository.findAll()
+        return crudRepository.findAll()
                 .collectList()
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_ALL, OperationType.READ, error.getMessage()));
     }
 
     public Mono<List<Bill>> findBillsByCategory(final String category) {
-        return repository.findBillsByCategory(category)
+        return crudRepository.findBillsByCategory(category)
                 .collectList()
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_CATEGORY, OperationType.READ, category, error.getMessage()));
     }
 
     public Mono<String> deleteBillById(final String id) {
-        return repository.deleteById(id)
+        return crudRepository.deleteById(id)
                 .map(bill -> id)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, id, error.getMessage()));
+    }
+
+    private Bill updateBillId(final Bill bill, final String id) {
+        bill.setId(id);
+        return bill;
     }
 }

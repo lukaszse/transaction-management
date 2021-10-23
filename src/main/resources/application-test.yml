@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      database: test-simple-bills
+
+#custom
+hello: "Hello in my application"
