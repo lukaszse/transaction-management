@@ -29,6 +29,22 @@ public class BillCrudRepositoryIntegrationTest {
     @Autowired
     public BillCrudRepository repository;
 
+    @BeforeEach
+    public void setup() {
+        try {
+            repository.deleteAll().block();
+        } catch (Exception e) {
+            log.info("Some errors while Bills deleting occurred");
+        }
+    }
+
+    @AfterEach
+    public void teardown() {
+        repository.deleteAll().block();
+        log.info("Deleting all bills");
+    }
+
+
     @Test
     public void fetchDocument() {
 
@@ -49,19 +65,6 @@ public class BillCrudRepositoryIntegrationTest {
                 .verify();
     }
 
-    @BeforeEach
-    public void setup() {
-        try {
-            repository.deleteAll();
-        } catch (Exception e) {
-            log.info("Some errors while Bills deleting occurred");
-        }
-    }
-
-    @AfterEach
-    public void teardown() {
-        repository.deleteAll();
-    }
 
     @Test
     public void fetchAllDocuments() {
