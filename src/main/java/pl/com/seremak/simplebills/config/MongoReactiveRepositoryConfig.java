@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 
 @Configuration
 @EnableReactiveMongoRepositories(basePackages = "pl.com.seremak.simplebills.repository")
-public class MongoReactiveConfig extends AbstractReactiveMongoConfiguration {
+public class MongoReactiveRepositoryConfig extends AbstractReactiveMongoConfiguration {
 
     @Value("${spring.data.mongodb.database}")
     private String simpleBillDatabase;

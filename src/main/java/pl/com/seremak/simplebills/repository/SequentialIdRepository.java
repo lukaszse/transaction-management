@@ -1,68 +1,60 @@
 package pl.com.seremak.simplebills.repository;
 
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.InsertOneResult;
-import com.mongodb.reactivestreams.client.MongoClient;
-import com.mongodb.reactivestreams.client.MongoCollection;
-import com.mongodb.reactivestreams.client.MongoDatabase;
 import lombok.RequiredArgsConstructor;
-import org.bson.conversions.Bson;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
 import pl.com.seremak.simplebills.model.sequentialId.SequentialId;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
-import java.util.List;
-
-
-@Repository
+@Component
 @RequiredArgsConstructor
 public class SequentialIdRepository {
 
-    private static final String SEQUENTIAL_ID_COLLECTION_NAME = "SequentialId";
-    private static final String SEQUENTIAL_ID_FIELD = "seq";
-    public static final String FIXED_ID = "1";
+    public static final String SEQUENTIAL_ID_COLLECTION_NAME = "sequential-id";
+    private static final int STARTING_ID = 1;
+    public static final String ID_FIELD = "_id";
+    public static final String SEQUENTIAL_ID_FIELD = "sequentialId";
+    private final ReactiveMongoTemplate mongoTemplate;
 
-    private final MongoClient mongoClient;
-    private MongoDatabase database;
-
-    @Value("${spring.data.mongodb.database}")
-    private String databaseName;
-
-    @PostConstruct
-    public void init() {
-        database = mongoClient.getDatabase(databaseName);
-    }
-
-    public Mono<String> generateId() {
-        return Mono.from(getSequentialIdCollection()
-                .findOneAndUpdate(Filters.eq(FIXED_ID), prepareIncrementExpression()))
-                .map(SequentialId::getSeq)
+    public Mono<String> generateId(final String user) {
+        return mongoTemplate.findAndModify(
+                prepareFindUserQuery(user),
+                prepareSequentialIdIncrementUpdate(),
+                new FindAndModifyOptions().returnNew(true),
+                SequentialId.class)
+                .map(SequentialId::getSequentialId)
                 .map(String::valueOf)
-                .switchIfEmpty(insertFirstSequentialId());
+                .switchIfEmpty(insertFirstSequentialId(user));
         // todo implement error handling
     }
 
-    private Mono<String> insertFirstSequentialId() {
-        return Mono.from(getSequentialIdCollection()
-                .insertOne(buildFirstSequentialId()))
-                .filter(InsertOneResult::wasAcknowledged)
-                .map(insertOneResult -> String.valueOf(1));
-        //todo - should throw exception if empty - use switchIfEmpty and throw custom Repository Exception
-    }
-    
-    private Bson prepareIncrementExpression() {
-        return Updates.inc(SEQUENTIAL_ID_FIELD, 1);
+    public Mono<Void> deleteUser(final String user) {
+        return mongoTemplate.findAndRemove(prepareFindUserQuery(user), SequentialId.class)
+                .switchIfEmpty(Mono.error(new Exception())) //todo add error handling
+                .then();
     }
 
-    private SequentialId buildFirstSequentialId() {
-        return new SequentialId(FIXED_ID, 0);
+    private Mono<String> insertFirstSequentialId(final String user) {
+        return mongoTemplate.insert(buildFirstSequentialId(user))
+                .map(SequentialId::getSequentialId)
+                .map(String::valueOf);
     }
 
-    private MongoCollection<SequentialId> getSequentialIdCollection() {
-        return database.getCollection(SEQUENTIAL_ID_COLLECTION_NAME, SequentialId.class);
+    private Query prepareFindUserQuery(final String user) {
+        return new Query()
+                .addCriteria(Criteria.where(ID_FIELD).is(user));
+    }
+
+    private Update prepareSequentialIdIncrementUpdate() {
+        return new Update()
+                .inc(SEQUENTIAL_ID_FIELD, 1);
+    }
+
+    private SequentialId buildFirstSequentialId(final String user) {
+        return new SequentialId(user, STARTING_ID);
     }
 }

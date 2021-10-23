@@ -1,9 +1,14 @@
 package pl.com.seremak.simplebills.intTest.repository;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import pl.com.seremak.simplebills.model.bill.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import reactor.core.publisher.Flux;
@@ -16,7 +21,9 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static pl.com.seremak.simplebills.intTest.repository.RepositoryTestData.*;
 
-@DataMongoTest
+@SpringBootTest
+@ActiveProfiles("test")
+@Slf4j
 public class BillCrudRepositoryIntegrationTest {
 
     @Autowired
@@ -40,6 +47,20 @@ public class BillCrudRepositoryIntegrationTest {
                 })
                 .expectComplete()
                 .verify();
+    }
+
+    @BeforeEach
+    public void setup() {
+        try {
+            repository.deleteAll();
+        } catch (Exception e) {
+            log.info("Some errors while Bills deleting occurred");
+        }
+    }
+
+    @AfterEach
+    public void teardown() {
+        repository.deleteAll();
     }
 
     @Test
