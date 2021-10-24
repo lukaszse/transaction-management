@@ -15,7 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
-@RequestMapping("/bill")
+@RequestMapping("/bills")
 @RequiredArgsConstructor
 public class BillCrudEndpoint {
 
@@ -55,7 +55,7 @@ public class BillCrudEndpoint {
     }
 
     private ResponseEntity<String> createResponse(final String id) {
-        return ResponseEntity.created(URI.create(String.format("/bill/%s", id)))
+        return ResponseEntity.created(URI.create(String.format("/bilsl/%s", id)))
                 .body(id);
     }
 }

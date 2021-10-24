@@ -1,3 +1,106 @@
+GET http://localhost:8080/bill/99
+
+<> 2021-10-24T231127.404.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-24T231115.201.json
+
+###
+
+GET http://localhost:8080/bill/99
+
+<> 2021-10-24T230758.404.json
+
+###
+
+GET http://localhost:8080/bill/99
+
+<> 2021-10-24T230047.500.json
+
+###
+
+GET http://localhost:8080/bill/7
+
+<> 2021-10-24T230040.200.json
+
+###
+
+GET http://localhost:8080/bill/7
+
+<> 2021-10-24T225155.200.json
+
+###
+
+GET http://localhost:8080/bill/34342
+
+###
+
+DELETE http://localhost:8080/bill/3434
+
+###
+
+DELETE http://localhost:8080/bill/3434
+
+###
+
+GET http://localhost:8080/bill/6
+
+<> 2021-10-24T225107.200.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-24T225020.201.json
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-24T224916.200.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+###
+
+GET http://localhost:8080/bill
+
+<> 2021-10-24T224814.400.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-24T224808.201.json
+
+###
+
 POST http://localhost:8080/bill
 Content-Type: application/json
 
