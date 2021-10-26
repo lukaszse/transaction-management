@@ -9,6 +9,7 @@ import pl.com.seremak.simplebills.service.BillCrudService;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -25,8 +26,10 @@ public class BillCrudEndpoint {
 
 
     @GetMapping(value = "/hello", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> sayHello() {
-        return Mono.just(hello)
+    public Mono<ResponseEntity<String>> sayHello(final Mono<Principal> principal) {
+        return principal
+                .map(Principal::getName)
+                .map(name -> hello.formatted(name))
                 .map(ResponseEntity::ok);
     }
 

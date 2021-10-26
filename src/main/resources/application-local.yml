@@ -8,4 +8,4 @@ server:
     include-stacktrace: never
 
 #custom
-hello: "Hello in my application"
+hello: "Hello %s, Welcome in my application!"
