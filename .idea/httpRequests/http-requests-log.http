@@ -1,3 +1,28 @@
+GET http://localhost:8080/bills/hello
+
+<> 2021-10-26T232349.200.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-26T231416.404.json
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-26T231350.404.json
+
+###
+
 GET http://localhost:8080/bill/99
 
 <> 2021-10-24T231127.404.json
@@ -370,25 +395,6 @@ GET http://localhost:8080/bill/hello
 GET http://localhost:8080/bill/hello
 
 <> 2021-10-16T174802.200.txt
-
-###
-
-GET http://localhost:8080/bill/hello
-
-<> 2021-10-16T174739.200.txt
-
-###
-
-GET http://localhost:8080/bill/hello
-
-###
-
-POST https://httpbin.org/post
-Content-Type: application/x-www-form-urlencoded
-
-id=999&value=content
-
-<> 2021-10-13T224144.200.json
 
 ###
 
