@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.com.seremak.simplebills.model.bill.Bill;
+import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.service.BillCrudService;
 import reactor.core.publisher.Mono;
 

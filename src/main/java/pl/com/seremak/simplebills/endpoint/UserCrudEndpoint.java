@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.com.seremak.simplebills.endpoint.dto.PasswordDto;
 import pl.com.seremak.simplebills.model.User;
 import pl.com.seremak.simplebills.service.UserCrudService;
 import reactor.core.publisher.Mono;
@@ -25,8 +26,8 @@ public class UserCrudEndpoint {
                 .map(this::createResponse);
     }
 
-    @GetMapping("/{email}")
-    Mono<ResponseEntity<User>> getUserByEmail(@PathVariable final String login) {
+    @GetMapping("/{login}")
+    Mono<ResponseEntity<User>> getUserByLogin(@PathVariable final String login) {
         return userCrudService.getUserByEmail(login)
                 .map(ResponseEntity::ok);
     }
@@ -37,8 +38,8 @@ public class UserCrudEndpoint {
     }
 
     @PatchMapping("/change-password")
-    private Mono<ResponseEntity<Void>> changePassword(final String user, final String password) {
-        return userCrudService.changePassword(user, password)
+    private Mono<ResponseEntity<Void>> changePassword(@Valid @RequestBody final PasswordDto passwordDto) {
+        return userCrudService.changePassword(passwordDto)
                 .map(ResponseEntity::ok);
     }
 }

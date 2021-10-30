@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.model.sequentialId;
+package pl.com.seremak.simplebills.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
