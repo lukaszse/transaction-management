@@ -8,6 +8,7 @@ import pl.com.seremak.simplebills.model.bill.Bill;
 import pl.com.seremak.simplebills.service.BillCrudService;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
@@ -34,7 +35,7 @@ public class BillCrudEndpoint {
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> createBill(@RequestBody final Bill bill) {
+    public Mono<ResponseEntity<String>> createBill(@Valid @RequestBody final Bill bill) {
         return service.createBill(bill)
                 .map(this::createResponse);
     }

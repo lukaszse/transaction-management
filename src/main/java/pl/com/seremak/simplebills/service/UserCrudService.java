@@ -12,14 +12,12 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserCrudService {
 
     private final UserCrudRepository userCrudRepository;
 
-    @PostConstruct
-    void createDefaultAdminAccount() {
-        userCrudRepository.save(createAdmin());
+    UserCrudService(UserCrudRepository userCrudRepository) {
+        this.userCrudRepository = userCrudRepository;
     }
 
     public Mono<String> createUser(final User user) {
@@ -35,13 +33,6 @@ public class UserCrudService {
 
     public Mono<Void> changePassword(final String user, final String password) {
         return Mono.empty();
-    }
-
-    private User createAdmin() {
-        return User.builder()
-                .login("admin")
-                .password("admin")
-                .build();
     }
 
     private Mono<Boolean> checkIfAdminExist() {
