@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
-import javax.persistence.Tuple;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 

@@ -13,8 +13,6 @@ import pl.com.seremak.simplebills.model.User;
 import pl.com.seremak.simplebills.repository.UserCrudRepository;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor

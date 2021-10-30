@@ -11,6 +11,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class Metadata {
 
+    private Long version;
     private Instant createdAt;
     private Instant modifiedAt;
 }
