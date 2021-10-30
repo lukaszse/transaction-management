@@ -21,7 +21,8 @@ public class SpringSecurity {
         return http.authorizeExchange()
                 .anyExchange().authenticated()
                 .and().httpBasic()
-                .and().build();
+                .and().csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .build();
     }
 
     @Bean
