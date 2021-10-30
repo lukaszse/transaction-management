@@ -8,14 +8,16 @@ import pl.com.seremak.simplebills.model.bill.Bill;
 import pl.com.seremak.simplebills.service.BillCrudService;
 import reactor.core.publisher.Mono;
 
+import javax.validation.Valid;
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
-@RequestMapping("/bill")
+@RequestMapping("/bills")
 @RequiredArgsConstructor
 public class BillCrudEndpoint {
 
@@ -25,13 +27,15 @@ public class BillCrudEndpoint {
 
 
     @GetMapping(value = "/hello", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> sayHello() {
-        return Mono.just(hello)
+    public Mono<ResponseEntity<String>> sayHello(final Mono<Principal> principal) {
+        return principal
+                .map(Principal::getName)
+                .map(name -> hello.formatted(name))
                 .map(ResponseEntity::ok);
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> createBill(@RequestBody final Bill bill) {
+    public Mono<ResponseEntity<String>> createBill(@Valid @RequestBody final Bill bill) {
         return service.createBill(bill)
                 .map(this::createResponse);
     }
@@ -55,7 +59,7 @@ public class BillCrudEndpoint {
     }
 
     private ResponseEntity<String> createResponse(final String id) {
-        return ResponseEntity.created(URI.create(String.format("/bill/%s", id)))
+        return ResponseEntity.created(URI.create(String.format("/bilsl/%s", id)))
                 .body(id);
     }
 }

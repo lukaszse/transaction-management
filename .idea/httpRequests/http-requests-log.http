@@ -1,0 +1,422 @@
+GET http://localhost:8080/bills/hello
+
+###
+
+POST http://localhost:8080/bills
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+###
+
+POST http://localhost:8080/bills
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+###
+
+POST http://localhost:8080/bills
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-28T001458.403.txt
+
+###
+
+POST http://localhost:8080/bills
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-28T001443.403.txt
+
+###
+
+GET http://localhost:8080/bills/hello
+
+<> 2021-10-26T232349.200.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-26T231416.404.json
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-26T231350.404.json
+
+###
+
+GET http://localhost:8080/bill/99
+
+<> 2021-10-24T231127.404.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-24T231115.201.json
+
+###
+
+GET http://localhost:8080/bill/99
+
+<> 2021-10-24T230758.404.json
+
+###
+
+GET http://localhost:8080/bill/99
+
+<> 2021-10-24T230047.500.json
+
+###
+
+GET http://localhost:8080/bill/7
+
+<> 2021-10-24T230040.200.json
+
+###
+
+GET http://localhost:8080/bill/7
+
+<> 2021-10-24T225155.200.json
+
+###
+
+GET http://localhost:8080/bill/34342
+
+###
+
+DELETE http://localhost:8080/bill/3434
+
+###
+
+DELETE http://localhost:8080/bill/3434
+
+###
+
+GET http://localhost:8080/bill/6
+
+<> 2021-10-24T225107.200.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-24T225020.201.json
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-24T224916.200.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+###
+
+GET http://localhost:8080/bill
+
+<> 2021-10-24T224814.400.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-24T224808.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-23T204851.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-23T204847.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-23T204843.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-23T204838.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-23T204550.500.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery",
+  "user": "lukasz"
+}
+
+<> 2021-10-23T203803.500.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Energetyk w zabce",
+  "category": "grocery"
+}
+
+<> 2021-10-23T194554.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Zakupy w lidlu",
+  "category": "grocery"
+}
+
+<> 2021-10-23T194539.201.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Zakupy w biedrze",
+  "category": "grocery"
+}
+
+<> 2021-10-23T194408.201.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+<> 2021-10-17T224333.200.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+<> 2021-10-17T224248.200.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+<> 2021-10-17T224235.200.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+<> 2021-10-17T223158.500.json
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+<> 2021-10-17T223146.500.json
+
+###
+
+GET http://localhost:8080/bill/{{id}}
+
+###
+
+GET http://localhost:8080/bill/616c86387c815a6a710d89b4
+
+<> 2021-10-17T222947.500.json
+
+###
+
+GET http://localhost:8080/bill
+
+<> 2021-10-17T222523.200.json
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Zakupy w biedrze",
+  "category": "grocery"
+}
+
+<> 2021-10-17T215718.201.txt
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+{:
+  "description": "Zakupy w biedrze",
+  "category": "grocery"
+}:
+
+<> 2021-10-17T215636.400.html
+
+###
+
+POST http://localhost:8080/bill
+Content-Type: application/json
+
+{
+  "description": "Zakupy w biedrze",
+  "category": "grocery"
+}
+
+<> 2021-10-17T215523.201.txt
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-17T215224.200.txt
+
+###
+
+POST http://localhost:8080/bill
+
+<> 2021-10-17T215132.201.txt
+
+###
+
+POST http://localhost:8080/bill
+
+<> 2021-10-17T215057.201.txt
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-16T180149.200.txt
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-16T180129.200.txt
+
+###
+
+GET http://localhost:8080/bill/hello
+
+<> 2021-10-16T175841.200.txt
+
+###
+
