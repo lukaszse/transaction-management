@@ -1,16 +1,28 @@
 package pl.com.seremak.simplebills.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Bill;
+import pl.com.seremak.simplebills.model.Metadata;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.service.util.OperationType;
+import pl.com.seremak.simplebills.service.util.ServiceCommons;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+
+import static pl.com.seremak.simplebills.service.util.ServiceCommons.*;
 
 @Slf4j
 @Service
@@ -24,12 +36,16 @@ public class BillCrudService {
     public static final String NOT_FOUND_ERROR_MESSAGE = "Bill with id=%s not found";
 
     private final BillCrudRepository crudRepository;
+    private final ReactiveMongoTemplate mongoTemplate;
     private final SequentialIdService sequentialIdRepository;
+    private final ObjectMapper objectMapper;
 
     public Mono<String> createBill(final Bill bill) {
         return sequentialIdRepository.generateId(DEFAULT_USER)
                 .map(id -> updateBillId(bill, id))
-                .map(theBill -> crudRepository.save(bill)
+                .map(this::setCurrentDateIfMissing)
+                .map(this::setMetadata)
+                .map(theBill -> crudRepository.save(theBill)
                         .map(Bill::getId))
                 .flatMap(id -> id);
 
@@ -59,8 +75,50 @@ public class BillCrudService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, id, error.getMessage()));
     }
 
+    public Mono<String> updateBillById(final Bill bill) {
+        return mongoTemplate.findAndModify(
+                        prepareFindBillQuery(bill.getId()),
+                        preparePartialUpdateQuery(bill),
+                        new FindAndModifyOptions().returnNew(true),
+                        Bill.class)
+                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getId()))))
+                .map(Bill::getId);
+    }
+
     private Bill updateBillId(final Bill bill, final String id) {
         bill.setId(id);
         return bill;
+    }
+
+    private Bill setCurrentDateIfMissing(final Bill bill) {
+        if (bill.getDate() == null) {
+            bill.setDate(Instant.now());
+        }
+        return bill;
+    }
+
+    private Bill setMetadata(final Bill bill) {
+        bill.setMetadata(
+                Metadata.builder()
+                        .createdAt(Instant.now())
+                        .modifiedAt(Instant.now())
+                        .version(1L)
+                        .build());
+        return bill;
+    }
+
+    private Query prepareFindBillQuery(final String id) {
+        return new Query()
+                .addCriteria(Criteria.where(ID_FIELD).is(id));
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private Update preparePartialUpdateQuery(final Bill bill) {
+        Update update = new Update();
+        Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
+        fieldsMap.entrySet().stream()
+                .filter(field -> field.getValue() != null)
+                .forEach(field -> update.set(field.getKey(), field.getValue()));
+        return updateMetadata(update);
     }
 }

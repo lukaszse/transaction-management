@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -27,7 +28,7 @@ public class Bill {
     private String description;
     @NotBlank(message = "Category cannot be blank")
     private String category;
-    @NotBlank(message = "Amount cannot be blank")
+    @NotNull(message = "Amount cannot be null")
     @Min(value = 0, message = "Amount cannot be negative")
     private BigDecimal amount;
     private Metadata metadata;

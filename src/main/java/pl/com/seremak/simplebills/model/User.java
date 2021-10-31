@@ -25,4 +25,5 @@ public class User {
     private String lastName;
     @NotBlank(message = "Password cannot be blank")
     private String password;
+    private Metadata metadata;
 }

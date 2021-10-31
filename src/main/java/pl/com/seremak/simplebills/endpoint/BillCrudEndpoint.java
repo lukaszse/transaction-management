@@ -1,6 +1,7 @@
 package pl.com.seremak.simplebills.endpoint;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +42,7 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> findBillById(@PathVariable String id) {
+    public Mono<ResponseEntity<Bill>> findBillById(@PathVariable final String id) {
         return service.findBillById(id)
                 .map(ResponseEntity::ok);
     }
@@ -53,13 +54,20 @@ public class BillCrudEndpoint {
     }
 
     @DeleteMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> deleteBill(@PathVariable String id) {
+    public Mono<ResponseEntity<String>> deleteBill(@PathVariable final String id) {
         return service.deleteBillById(id)
                 .map(this::createResponse);
     }
 
+    @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<String>> updateBill(@RequestBody final Bill bill, @PathVariable final String id) {
+        bill.setId(id);
+        return service.updateBillById(bill)
+                .map(ResponseEntity::ok);
+    }
+
     private ResponseEntity<String> createResponse(final String id) {
-        return ResponseEntity.created(URI.create(String.format("/bilsl/%s", id)))
+        return ResponseEntity.created(URI.create(String.format("/bills/%s", id)))
                 .body(id);
     }
 }
