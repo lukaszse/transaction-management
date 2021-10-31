@@ -23,6 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class BillCrudEndpoint {
 
+    public static final String BILL_CREATION_RECEIVED_MESSAGE = "Received bill creation request from user={}";
     @Value("${hello}")
     private String hello;
     private final BillCrudService service;
@@ -40,33 +41,41 @@ public class BillCrudEndpoint {
     public Mono<ResponseEntity<String>> createBill(final Mono<Principal> principal, @Valid @RequestBody final Bill bill) {
         return principal
                 .map(Principal::getName)
-                .doOnSuccess(userName -> log.info("Principal user name={}", userName))
+                .doOnSuccess(userName -> log.info(BILL_CREATION_RECEIVED_MESSAGE, userName))
                 .flatMap(userName -> service.createBill(userName, bill))
                 .map(this::createResponse);
     }
 
     @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> findBillById(@PathVariable final String id) {
-        return service.findBillById(id)
+    public Mono<ResponseEntity<Bill>> findBillById(final Mono<Principal> principal, @PathVariable final String id) {
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> service.findBillByIdForUser(userName, id))
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, @RequestParam final String category) {
-        return service.findBillsByCategoryForUser(principal, category)
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> service.findBillsByCategoryForUser(userName, category))
                 .map(ResponseEntity::ok);
     }
 
     @DeleteMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> deleteBill(@PathVariable final String id) {
-        return service.deleteBillById(id)
+    public Mono<ResponseEntity<String>> deleteBill(final Mono<Principal> principal, @PathVariable final String id) {
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> service.deleteBillByIdForUser(userName, id))
                 .map(this::createResponse);
     }
 
     @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> updateBill(@RequestBody final Bill bill, @PathVariable final String id) {
+    public Mono<ResponseEntity<String>> updateBill(final Mono<Principal> principal, @RequestBody final Bill bill, @PathVariable final String id) {
         bill.setId(id);
-        return service.updateBillById(bill)
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> service.updateBillByIdForUser(userName, bill))
                 .map(ResponseEntity::ok);
     }
 
