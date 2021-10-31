@@ -3,6 +3,7 @@ package pl.com.seremak.simplebills.endpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
@@ -25,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class BillCrudEndpoint {
 
     public static final String BILL_CREATION_RECEIVED_MESSAGE = "Received bill creation request from user={}";
+    public static final String X_TOTAL_COUNT_HEADER = "XTotalCount";
     @Value("${hello}")
     private String hello;
     private final BillCrudService service;
@@ -57,10 +59,11 @@ public class BillCrudEndpoint {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, BillQueryParams params) {
+
         return principal
                 .map(Principal::getName)
                 .flatMap(userName -> service.findBillsByCategoryForUser(userName, params))
-                .map(ResponseEntity::ok);
+                .map(tuple -> ResponseEntity.ok().headers(prepareXTotalCountHeader(tuple.getT2())).body(tuple.getT1()));
     }
 
     @DeleteMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
@@ -83,5 +86,11 @@ public class BillCrudEndpoint {
     private ResponseEntity<String> createResponse(final String id) {
         return ResponseEntity.created(URI.create(String.format("/bills/%s", id)))
                 .body(id);
+    }
+
+    private HttpHeaders prepareXTotalCountHeader(final Long count) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(X_TOTAL_COUNT_HEADER, String.valueOf(count));
+        return headers;
     }
 }

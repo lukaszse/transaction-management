@@ -17,6 +17,7 @@ import pl.com.seremak.simplebills.model.Metadata;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.service.util.OperationType;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Instant;
 import java.util.List;
@@ -56,13 +57,20 @@ public class BillCrudService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, billNumber, userName, error.getMessage()));
     }
 
-    public Mono<List<Bill>> findBillsByCategoryForUser(final String userName, final BillQueryParams params) {
+    public Mono<Tuple2<List<Bill>,Long>> findBillsByCategoryForUser(final String userName, final BillQueryParams params) {
         return mongoTemplate.find(
                         prepareFindBillByUserAndCategoryQuery(userName, params),
                         Bill.class)
                 .skip(calculateSkip(params))
                 .take(extractPageSize(params))
-                .collectList();
+                .collectList()
+                .zipWith(countBillsByCategoryForUser(userName, params));
+    }
+
+    public Mono<Long> countBillsByCategoryForUser(final String userName, final BillQueryParams params) {
+        return mongoTemplate.count(
+                prepareFindBillByUserAndCategoryQuery(userName, params),
+                Bill.class);
     }
 
     public Mono<String> deleteBillByBillNumberForUser(final String userName, final String billNumber) {
