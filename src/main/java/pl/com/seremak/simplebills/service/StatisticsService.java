@@ -15,19 +15,19 @@ public class StatisticsService {
 
     private final BillCrudRepository crudRepository;
 
-    private Mono<BigDecimal> calculateSumForCategory(final String category) {
+    public Mono<BigDecimal> calculateSumForCategory(final String category) {
         return crudRepository.findBillsByCategory(category)
                 .map(Bill::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Mono<BigDecimal> calculateMeanForCategory(final String category) {
+    public Mono<BigDecimal> calculateMeanForCategory(final String category) {
         return calculateSumForCategory(category)
                 .zipWith(count(category))
                 .map(tuple -> tuple.getT1().divide(tuple.getT2(), 2, RoundingMode.HALF_UP));
     }
 
-    private Mono<BigDecimal> count(final String category) {
+    public Mono<BigDecimal> count(final String category) {
         return crudRepository.count()
                 .map(BigDecimal::valueOf);
     }
