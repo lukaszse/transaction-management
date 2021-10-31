@@ -28,12 +28,11 @@ import static pl.com.seremak.simplebills.service.util.ServiceCommons.*;
 @RequiredArgsConstructor
 public class BillCrudService {
 
-    public static final String OPERATION_ERROR_MESSAGE = "Cannot {} Bill with id={} for user={}. Error={}";
-    public static final String OPERATION_ERROR_MESSAGE_CATEGORY = "Cannot {} Bills with category={}. Error={}";
-    public static final String OPERATION_ERROR_MESSAGE_ALL = "Cannot {} Bills. Error={}";
-    public static final String DEFAULT_USER = "default_user";
-    public static final String NOT_FOUND_ERROR_MESSAGE = "Bill with id=%s not found";
+    public static final String OPERATION_ERROR_MESSAGE = "Cannot {} bill with billNumber={} for user={}. Error={}";
+    public static final String OPERATION_ERROR_MESSAGE_CATEGORY = "Cannot {} bills with category={}. Error={}";
+    public static final String NOT_FOUND_ERROR_MESSAGE = "Bill with billNumber=%s not found.";
     private static final String USER_FIELD = "user";
+    public static final String BILL_NUMBER_FIELD = "billNumber";
 
     private final BillCrudRepository crudRepository;
     private final ReactiveMongoTemplate mongoTemplate;
@@ -41,25 +40,18 @@ public class BillCrudService {
     private final ObjectMapper objectMapper;
 
     public Mono<String> createBill(final String userName, final Bill bill) {
-        return sequentialIdRepository.generateId(DEFAULT_USER)
-                .map(id -> updateBillId(bill, id, userName))
+        return sequentialIdRepository.generateId(userName)
+                .map(id -> setBillNumber(bill, id, userName))
                 .map(this::setCurrentDateIfMissing)
                 .map(this::setMetadata)
-                .map(theBill -> crudRepository.save(theBill)
-                        .map(Bill::getId))
-                .flatMap(id -> id);
+                .flatMap(theBill -> crudRepository.save(theBill)
+                        .map(Bill::getBillNumber));
     }
 
-    public Mono<Bill> findBillByIdForUser(final String userName, final String id) {
-        return crudRepository.findBillByUserAndId(userName, id)
-                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(id))))
-                .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, id, userName, error.getMessage()));
-    }
-
-    public Mono<List<Bill>> findAllBills() {
-        return crudRepository.findAll()
-                .collectList()
-                .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_ALL, OperationType.READ, error.getMessage()));
+    public Mono<Bill> findBillByBillNumberForUser(final String userName, final String billNumber) {
+        return crudRepository.findByUserAndBillNumber(userName, billNumber)
+                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(billNumber))))
+                .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, billNumber, userName, error.getMessage()));
     }
 
     public Mono<List<Bill>> findBillsByCategoryForUser(final String userName, final String category) {
@@ -68,25 +60,25 @@ public class BillCrudService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_CATEGORY, OperationType.READ, category, error.getMessage()));
     }
 
-    public Mono<String> deleteBillByIdForUser(final String userName, final String id) {
-        return crudRepository.deleteBillByUserAndId(userName, id)
-                .map(bill -> id)
-                .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, id, userName, error.getMessage()));
+    public Mono<String> deleteBillByBillNumberForUser(final String userName, final String billNumber) {
+        return crudRepository.deleteBillByUserAndBillNumber(userName, billNumber)
+                .map(bill -> billNumber)
+                .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, userName, error.getMessage()));
     }
 
-    public Mono<String> updateBillByIdForUser(final String userName, final Bill bill) {
+    public Mono<String> updateBillByBillNumberForUser(final String userName, final Bill bill) {
         return mongoTemplate.findAndModify(
-                        prepareFindBillQuery(userName, bill.getId()),
+                        prepareFindBillQuery(userName, bill.getBillNumber()),
                         preparePartialUpdateQuery(bill),
                         new FindAndModifyOptions().returnNew(true),
                         Bill.class)
-                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getId()))))
-                .map(Bill::getId);
+                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))))
+                .map(Bill::getBillNumber);
     }
 
-    private Bill updateBillId(final Bill bill, final String id, final String userName) {
+    private Bill setBillNumber(final Bill bill, final String id, final String userName) {
         bill.setUser(userName);
-        bill.setId(id);
+        bill.setBillNumber(id);
         return bill;
     }
 
@@ -107,10 +99,10 @@ public class BillCrudService {
         return bill;
     }
 
-    private Query prepareFindBillQuery(final String user, final String id) {
+    private Query prepareFindBillQuery(final String user, final String billNumber) {
         return new Query()
                 .addCriteria(Criteria.where(USER_FIELD).is(user))
-                .addCriteria(Criteria.where(ID_FIELD).is(id));
+                .addCriteria(Criteria.where(BILL_NUMBER_FIELD).is(billNumber));
     }
 
     @SuppressWarnings({"unchecked"})

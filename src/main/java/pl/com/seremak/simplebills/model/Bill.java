@@ -23,8 +23,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class Bill {
 
-    @Id
-    private String id;
+    private String billNumber;
     @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
     private String user;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")

@@ -46,11 +46,11 @@ public class BillCrudEndpoint {
                 .map(this::createResponse);
     }
 
-    @GetMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> findBillById(final Mono<Principal> principal, @PathVariable final String id) {
+    @GetMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<Bill>> findBillById(final Mono<Principal> principal, @PathVariable final String billNumber) {
         return principal
                 .map(Principal::getName)
-                .flatMap(userName -> service.findBillByIdForUser(userName, id))
+                .flatMap(userName -> service.findBillByBillNumberForUser(userName, billNumber))
                 .map(ResponseEntity::ok);
     }
 
@@ -62,20 +62,20 @@ public class BillCrudEndpoint {
                 .map(ResponseEntity::ok);
     }
 
-    @DeleteMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> deleteBill(final Mono<Principal> principal, @PathVariable final String id) {
+    @DeleteMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<String>> deleteBill(final Mono<Principal> principal, @PathVariable final String billNumber) {
         return principal
                 .map(Principal::getName)
-                .flatMap(userName -> service.deleteBillByIdForUser(userName, id))
+                .flatMap(userName -> service.deleteBillByBillNumberForUser(userName, billNumber))
                 .map(this::createResponse);
     }
 
     @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> updateBill(final Mono<Principal> principal, @RequestBody final Bill bill, @PathVariable final String id) {
-        bill.setId(id);
+        bill.setBillNumber(id);
         return principal
                 .map(Principal::getName)
-                .flatMap(userName -> service.updateBillByIdForUser(userName, bill))
+                .flatMap(userName -> service.updateBillByBillNumberForUser(userName, bill))
                 .map(ResponseEntity::ok);
     }
 
