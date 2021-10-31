@@ -7,23 +7,21 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import pl.com.seremak.simplebills.model.User;
 import pl.com.seremak.simplebills.repository.UserCrudRepository;
-import pl.com.seremak.simplebills.service.UserCrudService;
-
-import java.util.Objects;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DefaultAdminAccountSetup {
 
+    public static final String ADMIN = "admin";
     private final UserCrudRepository userCrudRepository;
 
     @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if(Objects.equals(userCrudRepository.count().block(), 0L)) {
-            createDefaultAdminAccount();
-        } else {
+        if(isAdminCreated()) {
             logAdminPassword();
+        } else {
+            createDefaultAdminAccount();
         }
     }
 
@@ -35,7 +33,7 @@ public class DefaultAdminAccountSetup {
     }
 
     public void logAdminPassword() {
-        User admin = userCrudRepository.findByLogin("admin").block();
+        User admin = userCrudRepository.findByLogin(ADMIN).block();
         log.info("Admin account already exists. Login: {}, password: {}", admin.getLogin(), admin.getPassword());
     }
 
@@ -44,6 +42,10 @@ public class DefaultAdminAccountSetup {
                 .login("admin")
                 .password("admin")
                 .build();
+    }
+
+    private Boolean isAdminCreated() {
+        return userCrudRepository.existsById(ADMIN).block();
     }
 
 }
