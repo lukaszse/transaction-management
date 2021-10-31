@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.repository;
+package pl.com.seremak.simplebills.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -7,14 +7,13 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import pl.com.seremak.simplebills.model.sequentialId.SequentialId;
+import pl.com.seremak.simplebills.model.SequentialId;
 import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class SequentialIdRepository {
+public class SequentialIdService {
 
-    public static final String SEQUENTIAL_ID_COLLECTION_NAME = "sequential-id";
     private static final int STARTING_ID = 1;
     public static final String ID_FIELD = "_id";
     public static final String SEQUENTIAL_ID_FIELD = "sequentialId";

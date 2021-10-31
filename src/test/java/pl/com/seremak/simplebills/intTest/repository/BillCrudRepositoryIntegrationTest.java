@@ -6,10 +6,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import pl.com.seremak.simplebills.model.bill.Bill;
+import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -52,7 +51,7 @@ public class BillCrudRepositoryIntegrationTest {
         repository.save(prepareBill("2")).block();
 
         // when
-        Mono<Bill> monoBill = repository.findById("2");
+        Mono<Bill> monoBill = repository.findByUserAndBillNumber(TEST_USER, "2");
 
         // then
         StepVerifier
