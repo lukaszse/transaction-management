@@ -20,26 +20,25 @@ public class UserCrudEndpoint {
 
     private final UserCrudService userCrudService;
 
-    @PostMapping
-    Mono<ResponseEntity<String>> createUser(@Valid @RequestBody final User user) {
+    @PostMapping("/admin")
+    public Mono<ResponseEntity<String>> createUser(@Valid @RequestBody final User user) {
         return userCrudService.createUser(user)
                 .map(this::createResponse);
     }
 
-    @GetMapping("/{login}")
-    Mono<ResponseEntity<User>> getUserByLogin(@PathVariable final String login) {
+    @GetMapping("/admin/{login}")
+    public Mono<ResponseEntity<User>> getUserByLogin(@PathVariable final String login) {
         return userCrudService.getUserByEmail(login)
                 .map(ResponseEntity::ok);
     }
 
+    @PatchMapping("/change-password")
+    public Mono<ResponseEntity<Void>> changePassword(@Valid @RequestBody final PasswordDto passwordDto) {
+        return userCrudService.changePassword(passwordDto)
+                .map(ResponseEntity::ok);
+    }
     private ResponseEntity<String> createResponse(final String id) {
         return ResponseEntity.created(URI.create(String.format("/users/%s", id)))
                 .body(id);
-    }
-
-    @PatchMapping("/change-password")
-    private Mono<ResponseEntity<Void>> changePassword(@Valid @RequestBody final PasswordDto passwordDto) {
-        return userCrudService.changePassword(passwordDto)
-                .map(ResponseEntity::ok);
     }
 }

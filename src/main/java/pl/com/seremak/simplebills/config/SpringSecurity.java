@@ -19,6 +19,7 @@ public class SpringSecurity {
     public SecurityWebFilterChain securityWebFilterChain(
             ServerHttpSecurity http) {
         return http.authorizeExchange()
+                .pathMatchers("/users/admin", "/users/admin/*").hasAuthority("ROLE_ADMIN")
                 .anyExchange().authenticated()
                 .and().httpBasic()
                 .and().csrf(ServerHttpSecurity.CsrfSpec::disable)
@@ -32,7 +33,12 @@ public class SpringSecurity {
                 .password(passwordEncoder().encode("password"))
                 .roles("USER")
                 .build();
-        return new MapReactiveUserDetailsService(user);
+        UserDetails admin = User
+                .withUsername("admin")
+                .password(passwordEncoder().encode("password"))
+                .roles("ADMIN")
+                .build();
+        return new MapReactiveUserDetailsService(user, admin);
     }
 
     private static PasswordEncoder passwordEncoder() {
