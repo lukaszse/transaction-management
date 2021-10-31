@@ -18,8 +18,8 @@ public class MyUserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return "admin".equals(user.getLogin()) ?
-                List.of(new SimpleGrantedAuthority("ADMIN")) :
-                List.of(new SimpleGrantedAuthority("USER"));
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
+                List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
