@@ -1,13 +1,11 @@
 package pl.com.seremak.simplebills.config;
 
-import com.fasterxml.jackson.databind.util.ArrayBuilders;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import pl.com.seremak.simplebills.model.User;
-import pl.com.seremak.simplebills.repository.UserCrudRepository;
 import pl.com.seremak.simplebills.service.UserCrudService;
 import reactor.core.publisher.Mono;
 
