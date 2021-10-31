@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      database: simple-bills
+      uri: mongodb://localhost:27017
+server:
+  error:
+    include-stacktrace: never
+
+#custom
+hello: "Hello %s, Welcome in my application!"
