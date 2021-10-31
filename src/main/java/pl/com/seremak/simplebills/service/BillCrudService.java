@@ -55,13 +55,13 @@ public class BillCrudService {
     }
 
     public Mono<List<Bill>> findBillsByCategoryForUser(final String userName, final String category) {
-        return crudRepository.findBillByUserAndCategory(userName, category)
+        return crudRepository.findByUserAndCategory(userName, category)
                 .collectList()
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_CATEGORY, OperationType.READ, category, error.getMessage()));
     }
 
     public Mono<String> deleteBillByBillNumberForUser(final String userName, final String billNumber) {
-        return crudRepository.deleteBillByUserAndBillNumber(userName, billNumber)
+        return crudRepository.deleteByUserAndBillNumber(userName, billNumber)
                 .map(bill -> billNumber)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, userName, error.getMessage()));
     }

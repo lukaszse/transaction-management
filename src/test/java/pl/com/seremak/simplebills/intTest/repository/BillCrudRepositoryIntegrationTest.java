@@ -51,7 +51,7 @@ public class BillCrudRepositoryIntegrationTest {
         repository.save(prepareBill("2")).block();
 
         // when
-        Mono<Bill> monoBill = repository.findById("2");
+        Mono<Bill> monoBill = repository.findByUserAndBillNumber(TEST_USER, "2");
 
         // then
         StepVerifier
