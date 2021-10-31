@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.model.Metadata;
@@ -54,10 +55,11 @@ public class BillCrudService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, billNumber, userName, error.getMessage()));
     }
 
-    public Mono<List<Bill>> findBillsByCategoryForUser(final String userName, final String category) {
-        return crudRepository.findByUserAndCategory(userName, category)
-                .collectList()
-                .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_CATEGORY, OperationType.READ, category, error.getMessage()));
+    public Mono<List<Bill>> findBillsByCategoryForUser(final String userName, final BillQueryParams params) {
+        return mongoTemplate.find(
+                        prepareFindBillByUserAndCategoryQuery(userName, params),
+                        Bill.class)
+                .collectList();
     }
 
     public Mono<String> deleteBillByBillNumberForUser(final String userName, final String billNumber) {

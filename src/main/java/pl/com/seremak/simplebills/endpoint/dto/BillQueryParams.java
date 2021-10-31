@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.endpoint;
+package pl.com.seremak.simplebills.endpoint.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,16 +19,4 @@ public class BillQueryParams {
     private Instant dateFrom;
     @Nullable
     private Instant dateTo;
-
-//    public Instant getInstantDateFrom() {
-//        return Optional.ofNullable(dateFrom)
-//                .map(Instant::parse)
-//                .orElse(null);
-//    }
-//
-//    public Instant getInstantDateTo() {
-//        return Optional.ofNullable(dateTo)
-//                .map(Instant::parse)
-//                .orElse(null);
-//    }
 }

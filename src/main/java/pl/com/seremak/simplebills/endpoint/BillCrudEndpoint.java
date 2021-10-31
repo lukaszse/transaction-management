@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.service.BillCrudService;
 import reactor.core.publisher.Mono;
@@ -55,10 +56,10 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, @RequestParam final String category) {
+    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, BillQueryParams params) {
         return principal
                 .map(Principal::getName)
-                .flatMap(userName -> service.findBillsByCategoryForUser(userName, category))
+                .flatMap(userName -> service.findBillsByCategoryForUser(userName, params))
                 .map(ResponseEntity::ok);
     }
 

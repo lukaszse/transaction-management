@@ -2,17 +2,15 @@ package pl.com.seremak.simplebills.endpoint;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
 import pl.com.seremak.simplebills.service.StatisticsService;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.time.Instant;
 
 @RestController
 @RequestMapping("/statistics")
