@@ -15,20 +15,20 @@ public class StatisticsService {
 
     private final BillCrudRepository crudRepository;
 
-    public Mono<BigDecimal> calculateSumForCategory(final String category) {
-        return crudRepository.findBillsByCategory(category)
+    public Mono<BigDecimal> calculateSumForUserAndCategory(final String userName, final String category) {
+        return crudRepository.findBillByUserAndCategory(userName, category)
                 .map(Bill::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Mono<BigDecimal> calculateMeanForCategory(final String category) {
-        return calculateSumForCategory(category)
-                .zipWith(count(category))
+    public Mono<BigDecimal> calculateMeanForUserAndCategory(final String userName, final String category) {
+        return calculateSumForUserAndCategory(userName, category)
+                .zipWith(countByUserAndCategory(userName, category))
                 .map(tuple -> tuple.getT1().divide(tuple.getT2(), 2, RoundingMode.HALF_UP));
     }
 
-    public Mono<BigDecimal> count(final String category) {
-        return crudRepository.count()
+    public Mono<BigDecimal> countByUserAndCategory(final String userName, final String category) {
+        return crudRepository.countByUserAndCategory(userName, category)
                 .map(BigDecimal::valueOf);
     }
 

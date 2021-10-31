@@ -10,6 +10,7 @@ import pl.com.seremak.simplebills.service.StatisticsService;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/statistics")
@@ -19,14 +20,18 @@ public class StatisticsEndpoint {
     private final StatisticsService service;
 
     @GetMapping("/sum")
-    public Mono<ResponseEntity<BigDecimal>> calculateSum(@RequestParam final String category) {
-        return service.calculateSumForCategory(category)
+    public Mono<ResponseEntity<BigDecimal>> calculateSum(final Mono<Principal> principal, @RequestParam final String category) {
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> service.calculateSumForUserAndCategory(userName, category))
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/mean")
-    public Mono<ResponseEntity<BigDecimal>> calculateMean(@RequestParam final String category) {
-        return service.calculateMeanForCategory(category)
+    public Mono<ResponseEntity<BigDecimal>> calculateMean(final Mono<Principal> principal, @RequestParam final String category) {
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> service.calculateMeanForUserAndCategory(userName,category))
                 .map(ResponseEntity::ok);
     }
 }
