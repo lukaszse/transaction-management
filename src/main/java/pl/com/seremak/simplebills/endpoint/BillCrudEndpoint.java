@@ -74,9 +74,9 @@ public class BillCrudEndpoint {
                 .map(this::createResponse);
     }
 
-    @PatchMapping(value = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> updateBill(final Mono<Principal> principal, @RequestBody final Bill bill, @PathVariable final String id) {
-        bill.setBillNumber(id);
+    @PatchMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<String>> updateBill(final Mono<Principal> principal, @RequestBody final Bill bill, @PathVariable final String billNumber) {
+        bill.setBillNumber(billNumber);
         return principal
                 .map(Principal::getName)
                 .flatMap(userName -> service.updateBillByBillNumberForUser(userName, bill))
