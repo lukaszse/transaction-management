@@ -1,5 +1,8 @@
 package pl.com.seremak.simplebills.service.util;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -8,6 +11,7 @@ import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.model.Metadata;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class ServiceCommons {
     public static final String ID_FIELD = "_id";
@@ -16,6 +20,8 @@ public class ServiceCommons {
     public static final String CATEGORY_FIELD = "category";
     public static final String DATE_FIELD = "date";
     public static final String USER_FIELD = "user";
+    public static final int DEFAULT_PAGE_SIZE = 1000;
+    public static final int DEFAULT_PAGE_NUMBER = 1;
 
     public static Update updateMetadata(final Update update) {
         return update
@@ -43,5 +49,14 @@ public class ServiceCommons {
         }
         return query;
     }
+
+    public static long calculateSkip(final BillQueryParams params) {
+        return (long) Optional.ofNullable(params.getPageSize()).orElse(0) * (Optional.ofNullable(params.getPageNumber()).orElse(0)-1);
+    }
+
+    public static long extractPageSize(BillQueryParams params) {
+        return (long) Optional.ofNullable(params.getPageSize()).orElse(DEFAULT_PAGE_SIZE);
+    }
+
 
 }

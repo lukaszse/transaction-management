@@ -19,4 +19,8 @@ public class BillQueryParams {
     private Instant dateFrom;
     @Nullable
     private Instant dateTo;
+    @Nullable
+    private Integer pageSize;
+    @Nullable
+    private Integer pageNumber;
 }

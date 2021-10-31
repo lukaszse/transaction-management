@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static pl.com.seremak.simplebills.service.util.ServiceCommons.*;
 
@@ -59,6 +60,8 @@ public class BillCrudService {
         return mongoTemplate.find(
                         prepareFindBillByUserAndCategoryQuery(userName, params),
                         Bill.class)
+                .skip(calculateSkip(params))
+                .take(extractPageSize(params))
                 .collectList();
     }
 
