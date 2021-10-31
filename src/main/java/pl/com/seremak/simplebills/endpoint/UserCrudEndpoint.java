@@ -28,7 +28,7 @@ public class UserCrudEndpoint {
 
     @GetMapping("/admin/{login}")
     public Mono<ResponseEntity<User>> getUserByLogin(@PathVariable final String login) {
-        return userCrudService.getUserByEmail(login)
+        return userCrudService.getUserByLogin(login)
                 .map(ResponseEntity::ok);
     }
 

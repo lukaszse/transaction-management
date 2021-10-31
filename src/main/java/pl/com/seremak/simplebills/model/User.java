@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User  {
 
     @Id
     @NotBlank(message = "Login cannot be blank")

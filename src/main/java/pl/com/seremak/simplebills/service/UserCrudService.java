@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.endpoint.dto.PasswordDto;
 import pl.com.seremak.simplebills.model.Metadata;
@@ -33,12 +35,12 @@ public class UserCrudService {
 
 
     public Mono<String> createUser(final User user) {
-        return userCrudRepository.save(setMetadata(user))
+        return userCrudRepository.save(setMetadataAndEncodePassword(user))
                 .map(theUser -> user.getLogin())
                 .doOnError(error -> log.error(USER_CREATION_ERROR_MESSAGE, error.getMessage()));
     }
 
-    public Mono<User> getUserByEmail(final String login) {
+    public Mono<User> getUserByLogin(final String login) {
         return userCrudRepository.findByLogin(login)
                 .doOnError(error -> log.error(USER_NOT_FIND_ERROR_MESSAGE, login, error.getMessage()));
     }
@@ -63,7 +65,8 @@ public class UserCrudService {
         return updateMetadata(update);
     }
 
-    private User setMetadata(final User user) {
+    private User setMetadataAndEncodePassword(final User user) {
+        user.setPassword(encodePassword(user.getPassword()));
         user.setMetadata(
                 Metadata.builder()
                         .createdAt(Instant.now())
@@ -71,5 +74,13 @@ public class UserCrudService {
                         .version(1L)
                         .build());
         return user;
+    }
+
+    private static String encodePassword(final String password) {
+        return passwordEncoder().encode(password);
+    }
+
+    private static PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
