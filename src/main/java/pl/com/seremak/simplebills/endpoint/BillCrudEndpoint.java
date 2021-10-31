@@ -1,6 +1,7 @@
 package pl.com.seremak.simplebills.endpoint;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/bills")
 @RequiredArgsConstructor
@@ -35,8 +37,11 @@ public class BillCrudEndpoint {
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> createBill(@Valid @RequestBody final Bill bill) {
-        return service.createBill(bill)
+    public Mono<ResponseEntity<String>> createBill(final Mono<Principal> principal, @Valid @RequestBody final Bill bill) {
+        return principal
+                .map(Principal::getName)
+                .doOnSuccess(userName -> log.info("Principal user name={}", userName))
+                .flatMap(userName -> service.createBill(userName, bill))
                 .map(this::createResponse);
     }
 
@@ -47,8 +52,8 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(@RequestParam final String category) {
-        return service.findBillsByCategory(category)
+    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, @RequestParam final String category) {
+        return service.findBillsByCategoryForUser(principal, category)
                 .map(ResponseEntity::ok);
     }
 

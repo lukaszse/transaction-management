@@ -23,6 +23,7 @@ public class Bill {
 
     @Id
     private String id;
+    private String user;
     private Instant date;
     @NotBlank(message = "Description cannot be blank")
     private String description;

@@ -18,9 +18,11 @@ import pl.com.seremak.simplebills.service.util.OperationType;
 import pl.com.seremak.simplebills.service.util.ServiceCommons;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static pl.com.seremak.simplebills.service.util.ServiceCommons.*;
 
@@ -40,15 +42,14 @@ public class BillCrudService {
     private final SequentialIdService sequentialIdRepository;
     private final ObjectMapper objectMapper;
 
-    public Mono<String> createBill(final Bill bill) {
+    public Mono<String> createBill(final String userName, final Bill bill) {
         return sequentialIdRepository.generateId(DEFAULT_USER)
-                .map(id -> updateBillId(bill, id))
+                .map(id -> updateBillId( bill, id, userName))
                 .map(this::setCurrentDateIfMissing)
                 .map(this::setMetadata)
                 .map(theBill -> crudRepository.save(theBill)
                         .map(Bill::getId))
                 .flatMap(id -> id);
-
     }
 
     public Mono<Bill> findBillById(final String id) {
@@ -63,9 +64,10 @@ public class BillCrudService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_ALL, OperationType.READ, error.getMessage()));
     }
 
-    public Mono<List<Bill>> findBillsByCategory(final String category) {
-        return crudRepository.findBillsByCategory(category)
-                .collectList()
+    public Mono<List<Bill>> findBillsByCategoryForUser(Mono<Principal> principal, final String category) {
+        return principal
+                .map(Principal::getName)
+                .flatMap(userName -> findBillsByUserAndCategory(userName, category))
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE_CATEGORY, OperationType.READ, category, error.getMessage()));
     }
 
@@ -74,6 +76,12 @@ public class BillCrudService {
                 .map(bill -> id)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, id, error.getMessage()));
     }
+
+    private Mono<List<Bill>> findBillsByUserAndCategory(final String userName, final String category) {
+        return crudRepository.findBillByUserAndCategory(userName,category)
+                .collectList();
+    }
+
 
     public Mono<String> updateBillById(final Bill bill) {
         return mongoTemplate.findAndModify(
@@ -85,7 +93,8 @@ public class BillCrudService {
                 .map(Bill::getId);
     }
 
-    private Bill updateBillId(final Bill bill, final String id) {
+    private Bill updateBillId(final Bill bill, final String id, final String userName) {
+        bill.setUser(userName);
         bill.setId(id);
         return bill;
     }

@@ -14,5 +14,7 @@ public class PasswordDto {
     @NotBlank
     private String user;
     @NotBlank
-    private String password;
+    private String oldPassword;
+    @NotBlank
+    private String newPassword;
 }

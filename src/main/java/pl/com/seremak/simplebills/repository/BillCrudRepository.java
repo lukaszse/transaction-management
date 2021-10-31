@@ -9,4 +9,5 @@ import reactor.core.publisher.Flux;
 public interface BillCrudRepository extends ReactiveCrudRepository<Bill, String> {
 
     Flux<Bill> findBillsByCategory(final String category);
+    Flux<Bill> findBillByUserAndCategory(final String user, final String category);
 }

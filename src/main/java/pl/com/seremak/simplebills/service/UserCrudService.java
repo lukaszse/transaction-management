@@ -11,6 +11,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.endpoint.dto.PasswordDto;
+import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Metadata;
 import pl.com.seremak.simplebills.model.User;
 import pl.com.seremak.simplebills.repository.UserCrudRepository;
@@ -29,6 +30,7 @@ public class UserCrudService {
     public static final String USER_CREATION_ERROR_MESSAGE = "Cannot create user account. Error={}";
     public static final String USER_NOT_FIND_ERROR_MESSAGE = "Cannot find user with login={}. Error={}";
     public static final String PASSWORD_CHANGE_ERROR_MESSAGE = "Some errors while password changing occurred. Error={}";
+    public static final String PASSWORD_NOT_MATCHING_ERROR_MESSAGE = "Password for user=%s is not matching";
 
     private final UserCrudRepository userCrudRepository;
     private final ReactiveMongoTemplate mongoTemplate;
@@ -46,11 +48,23 @@ public class UserCrudService {
     }
 
     public Mono<Void> changePassword(final PasswordDto passwordDto) {
+        return isPasswordMatching(passwordDto)
+                .flatMap(isPasswordMatching -> updateIfPasswordMatching(passwordDto, isPasswordMatching));
+
+    }
+
+    private Mono<Void> updateIfPasswordMatching(final PasswordDto passwordDto, final boolean isPasswordMatching) {
+        return isPasswordMatching ?
+                updatePassword(passwordDto) :
+                Mono.error(new NotFoundException(PASSWORD_NOT_MATCHING_ERROR_MESSAGE.formatted(passwordDto.getUser())));
+    }
+
+    private Mono<Void> updatePassword(final PasswordDto passwordDto) {
         return mongoTemplate.findAndModify(
-                prepareFindUserQuery(passwordDto.getUser()),
-                prepareChangePasswordUpdate(passwordDto.getPassword()),
-                new FindAndModifyOptions().returnNew(true),
-                User.class)
+                        prepareFindUserQuery(passwordDto.getUser()),
+                        prepareChangePasswordUpdate(passwordDto.getNewPassword()),
+                        new FindAndModifyOptions().returnNew(true),
+                        User.class)
                 .doOnError(error -> log.error(PASSWORD_CHANGE_ERROR_MESSAGE, error.getMessage()))
                 .then();
     }
@@ -61,7 +75,7 @@ public class UserCrudService {
     }
 
     private Update prepareChangePasswordUpdate(final String newPassword) {
-        Update update = new Update().set(PASSWORD_FIELD, newPassword);
+        Update update = new Update().set(PASSWORD_FIELD, encodePassword(newPassword));
         return updateMetadata(update);
     }
 
@@ -75,6 +89,14 @@ public class UserCrudService {
                         .build());
         return user;
     }
+
+    private Mono<Boolean> isPasswordMatching(final PasswordDto passwordDto) {
+        return userCrudRepository.findByLogin(passwordDto.getUser())
+                .filter(user -> passwordEncoder().matches(passwordDto.getOldPassword(), user.getPassword()))
+                .map(user -> Boolean.TRUE)
+                .switchIfEmpty(Mono.just(Boolean.FALSE));
+    }
+
 
     private static String encodePassword(final String password) {
         return passwordEncoder().encode(password);
