@@ -46,8 +46,21 @@ public class StatisticsService {
     private Query prepareFindBillByUserAndCategoryQuery(final String userName, final BillQueryParams params) {
         Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
         if (params.getCategory() != null) query.addCriteria(Criteria.where(CATEGORY_FIELD).is(params.getCategory()));
-        if (params.getDateFrom() != null) query.addCriteria(Criteria.where(DATE_FIELD).gte(params.getInstantDateFrom()));
-        if (params.getDateTo() != null) query.addCriteria(Criteria.where(DATE_FIELD).gte(params.getInstantDateTo()));
+        return addBetweenDatesCriteria(params, query);
+    }
+
+    private Query addBetweenDatesCriteria(final BillQueryParams params, final Query query) {
+        Criteria criteria = Criteria.where(DATE_FIELD);
+        if (params.getDateFrom() != null && params.getDateTo() != null) {
+            criteria.gte(params.getDateFrom()).lte(params.getDateTo());
+            query.addCriteria(criteria);
+        } else if (params.getDateFrom() != null) {
+            criteria.gte(params.getDateFrom());
+            query.addCriteria(criteria);
+        } else if (params.getDateTo() != null) {
+            criteria.lte(params.getDateTo());
+            query.addCriteria(criteria);
+        }
         return query;
     }
 }

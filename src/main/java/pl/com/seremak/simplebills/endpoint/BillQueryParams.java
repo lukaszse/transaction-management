@@ -16,19 +16,19 @@ public class BillQueryParams {
     @Nullable
     private String category;
     @Nullable
-    private String dateFrom;
+    private Instant dateFrom;
     @Nullable
-    private String dateTo;
+    private Instant dateTo;
 
-    public Instant getInstantDateFrom() {
-        return Optional.ofNullable(dateFrom)
-                .map(Instant::parse)
-                .orElse(null);
-    }
-
-    public Instant getInstantDateTo() {
-        return Optional.ofNullable(dateTo)
-                .map(Instant::parse)
-                .orElse(null);
-    }
+//    public Instant getInstantDateFrom() {
+//        return Optional.ofNullable(dateFrom)
+//                .map(Instant::parse)
+//                .orElse(null);
+//    }
+//
+//    public Instant getInstantDateTo() {
+//        return Optional.ofNullable(dateTo)
+//                .map(Instant::parse)
+//                .orElse(null);
+//    }
 }
