@@ -41,13 +41,12 @@ public class BillCrudService {
     private final SequentialIdService sequentialIdRepository;
     private final ObjectMapper objectMapper;
 
-    public Mono<String> createBill(final String userName, final Bill bill) {
+    public Mono<Bill> createBill(final String userName, final Bill bill) {
         return sequentialIdRepository.generateId(userName)
                 .map(id -> setBillNumber(bill, id, userName))
                 .map(this::setCurrentDateIfMissing)
                 .map(this::setMetadata)
-                .flatMap(theBill -> crudRepository.save(theBill)
-                        .map(Bill::getBillNumber));
+                .flatMap(crudRepository::save);
     }
 
     public Mono<Bill> findBillByBillNumberForUser(final String userName, final String billNumber) {
@@ -72,20 +71,18 @@ public class BillCrudService {
                 Bill.class);
     }
 
-    public Mono<String> deleteBillByBillNumberForUser(final String userName, final String billNumber) {
+    public Mono<Bill> deleteBillByBillNumberForUser(final String userName, final String billNumber) {
         return crudRepository.deleteByUserAndBillNumber(userName, billNumber)
-                .map(bill -> billNumber)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, userName, error.getMessage()));
     }
 
-    public Mono<String> updateBillByBillNumberForUser(final String userName, final Bill bill) {
+    public Mono<Bill> updateBillByBillNumberForUser(final String userName, final Bill bill) {
         return mongoTemplate.findAndModify(
                         prepareFindBillQuery(userName, bill.getBillNumber()),
                         preparePartialUpdateQuery(bill),
                         new FindAndModifyOptions().returnNew(true),
                         Bill.class)
-                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))))
-                .map(Bill::getBillNumber);
+                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
 
     private Bill setBillNumber(final Bill bill, final String id, final String userName) {

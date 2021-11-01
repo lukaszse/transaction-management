@@ -2,6 +2,7 @@ package pl.com.seremak.simplebills.endpoint;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,12 +27,13 @@ public class UserInfoEndpoint {
     private final UserCrudService userCrudService;
 
     @GetMapping(value = "/{userName}", produces = APPLICATION_JSON_VALUE)
-    Mono<UserInfoDto> getInfoAboutUser(@PathVariable final String userName, final BillQueryParams params) {
+    Mono<ResponseEntity<UserInfoDto>> getInfoAboutUser(@PathVariable final String userName, final BillQueryParams params) {
         log.info(USER_INFO_REQUEST_RECEIVED_MESSAGE, userName);
         return userCrudService
                 .getUserByLogin(userName)
                 .zipWith(statisticsService.getStatisticsForUser(userName, params))
                 .map(UserInfoDto::of)
-                .doOnSuccess(__ -> log.info(USER_INFO_FETCHED_MESSAGE, userName));
+                .doOnSuccess(__ -> log.info(USER_INFO_FETCHED_MESSAGE, userName))
+                .map(ResponseEntity::ok);
     }
 }
