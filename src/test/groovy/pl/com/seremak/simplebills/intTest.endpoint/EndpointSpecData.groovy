@@ -9,12 +9,12 @@ import java.time.Instant
 class EndpointSpecData {
 
     static def TEST_USER = "testuser"
+    static def TEST_PASSWORD = "12345"
     static def FOOD = "food"
     static def TRAVEL = "travel"
-    static def TEST_PASSWORD = "12345"
     static def AUTHORIZATION_HEADER_NAME = "Authorization"
     static def BASIC_TOKEN = "Basic dGVzdHVzZXI6MTIzNDU="
-    static def SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN = "http://localhost:%d/statistics/mean?category=%s"
+    static def SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN = "http://localhost:%d/statistics/%s?category=%s"
 
 
     static def prepareBill(
@@ -46,6 +46,6 @@ class EndpointSpecData {
         User.builder()
                 .login(TEST_USER)
                 .password(TEST_PASSWORD)
-                .build();
+                .build()
     }
 }

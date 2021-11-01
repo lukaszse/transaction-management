@@ -24,7 +24,7 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
     def 'should calculate sum for bills'() {
         given: 'prepare request'
         def request =
-                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, FOOD))
+                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, "sum", FOOD))
                         .accept(MediaType.APPLICATION_JSON)
                         .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
                         .build()
@@ -35,6 +35,6 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
         then:
         response != null
         response.getStatusCode() == HttpStatus.OK
-        response.getBody() == BigDecimal.valueOf(55)
+        response.getBody() == BigDecimal.valueOf(450)
     }
 }

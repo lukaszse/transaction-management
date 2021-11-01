@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate
 import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
 import pl.com.seremak.simplebills.repository.BillCrudRepository
 import pl.com.seremak.simplebills.repository.UserCrudRepository
+import pl.com.seremak.simplebills.service.UserCrudService
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -24,7 +25,7 @@ import static pl.com.seremak.simplebills.EndpointSpecData.*
 class EndpointIntSpec extends Specification{
 
     @LocalServerPort
-    protected int port;
+    protected int port
 
     @Autowired
     StatisticsEndpoint statisticsEndpoint
@@ -33,7 +34,10 @@ class EndpointIntSpec extends Specification{
     BillCrudRepository billCrudRepository
 
     @Autowired
-    UserCrudRepository userCrudRepository;
+    UserCrudRepository userCrudRepository
+
+    @Autowired
+    UserCrudService userCrudService
 
     @Shared
     RestTemplate client = new RestTemplate()
@@ -44,10 +48,10 @@ class EndpointIntSpec extends Specification{
         IntStream.range(1, 10)
                 .forEach(i ->
                         billCrudRepository.save(prepareBill(i, 10 * i, FOOD, Instant.now().minus(1 * i, ChronoUnit.DAYS))).block())
-        IntStream.range(11, 12)
+        IntStream.range(10, 12)
                 .forEach(i ->
-                        billCrudRepository.save(prepareBill(i, 2666 * i, TRAVEL, Instant.now().minus(360 * i, ChronoUnit.DAYS))).block())
-        userCrudRepository.save(createTestUser()).block()
+                        billCrudRepository.save(prepareBill(i, 200 * i, TRAVEL, Instant.now().minus(360 * i, ChronoUnit.DAYS))).block())
+        userCrudService.createUser(createTestUser()).block()
     }
 
     def cleanup() {
