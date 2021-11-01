@@ -11,6 +11,7 @@ import pl.com.seremak.simplebills.repository.UserCrudRepository
 import pl.com.seremak.simplebills.service.UserCrudService
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -39,7 +40,10 @@ class EndpointIntSpec extends Specification {
     UserCrudService userCrudService
 
     @Shared
-    RestTemplate client = new RestTemplate()
+    def client = new RestTemplate()
+
+    def conditions = new PollingConditions(timeout: 5, initialDelay: 1)
+
 
     def setup() {
         // populate database for tests

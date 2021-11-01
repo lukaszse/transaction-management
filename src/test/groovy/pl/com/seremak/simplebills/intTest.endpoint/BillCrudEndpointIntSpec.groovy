@@ -15,24 +15,31 @@ class BillCrudEndpointIntSpec extends EndpointIntSpec {
     def 'should create bill for user and then fetch created bill'() {
 
         given: 'prepare request for bill creation'
-        def request =
+        def creationRequest =
                 RequestEntity.post(SERVICE_URL_BILL_CRUD_PATTERN.formatted(port, StringUtils.EMPTY))
                         .accept(MediaType.APPLICATION_JSON)
                         .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
-                        .body(prepareBillForEndpointTest(amount, category, Instant.now()))
+                        .body(prepareBillForEndpointTest(100, FOOD, Instant.now()))
+
 
         when: 'make request to crate bill'
-        def response = client.exchange(request, String.class)
+        def billNumber = client.exchange(creationRequest, String.class)
 
-        then: 'should return correct creation response'
-        response != null
-        response.getStatusCode() == HttpStatus.CREATED
 
-        where:
-        amount | category
-        5d     | FOOD
-        69.99d | FOOD
-        9999d  | TRAVEL
+        then: 'should return correct creation response and retrieve created bill'
+        conditions.eventually {
+
+            def fetchResponse = client.exchange(
+                    RequestEntity.get(SERVICE_URL_BILL_CRUD_PATTERN.formatted(port, "/%s".formatted(billNumber.getBody())))
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
+                            .build(),
+                    Bill.class)
+
+            assert fetchResponse != null
+            assert fetchResponse.getStatusCode() == HttpStatus.OK
+            assert fetchResponse.getBody().getCategory() == FOOD
+        }
     }
 
     def 'should fetch bill'() {
@@ -51,7 +58,7 @@ class BillCrudEndpointIntSpec extends EndpointIntSpec {
         response != null
         response.getStatusCode() == HttpStatus.OK
         response.getBody().getCategory() == category
-        response.getBody().getAmount() == amount
+        response.getBody().getAmount() == BigDecimal.valueOf(amount)
 
         where:
         billNumber | category | amount
