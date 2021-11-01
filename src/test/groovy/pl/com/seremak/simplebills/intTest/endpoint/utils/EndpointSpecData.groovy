@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.intTest.endpoint
+package pl.com.seremak.simplebills.intTest.endpoint.utils
 
 import pl.com.seremak.simplebills.model.Bill
 import pl.com.seremak.simplebills.model.Metadata
@@ -17,6 +17,7 @@ class EndpointSpecData {
     static def BASIC_TOKEN = "Basic dGVzdHVzZXI6MTIzNDU="
     static def SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN = "http://localhost:%d/statistics%s?category=%s"
     static def SERVICE_URL_BILL_CRUD_PATTERN = "http://localhost:%d/bills%s"
+    static def SERVICE_URL_CHANGE_PASSWORD_PATTERN = "http://localhost:%d/users/change-password"
     static def FOOD_SHOPPING_DESCRIPTION = "Food shopping"
     static def DESCRIPTION_PATTERN = "%s shopping"
 
@@ -64,5 +65,13 @@ class EndpointSpecData {
                 .login(TEST_USER)
                 .password(TEST_PASSWORD)
                 .build()
+    }
+
+    static def createChangePasswordRequestBody() {
+        Map.of(
+                "user", TEST_USER,
+                "oldPassword", TEST_PASSWORD,
+                "newPassword", "12345"
+        )
     }
 }

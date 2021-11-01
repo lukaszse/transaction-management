@@ -8,7 +8,7 @@ import pl.com.seremak.simplebills.model.Bill
 
 import java.time.Instant
 
-import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
+import static pl.com.seremak.simplebills.intTest.endpoint.utils.EndpointSpecData.*
 
 class BillCrudEndpointIntSpec extends EndpointIntSpec {
 
@@ -22,11 +22,11 @@ class BillCrudEndpointIntSpec extends EndpointIntSpec {
                         .body(prepareBillForEndpointTest(amount, category, Instant.now()))
 
         when: 'make request to crate bill'
-        def creationResponse = client.exchange(request, String.class)
+        def response = client.exchange(request, String.class)
 
         then: 'should return correct creation response'
-        creationResponse != null
-        creationResponse.getStatusCode() == HttpStatus.CREATED
+        response != null
+        response.getStatusCode() == HttpStatus.CREATED
 
         where:
         amount | category
@@ -45,13 +45,13 @@ class BillCrudEndpointIntSpec extends EndpointIntSpec {
                         .build()
 
         when: 'should fetch bill'
-        def fetchResponse = client.exchange(request, Bill.class)
+        def response = client.exchange(request, Bill.class)
 
         then:
-        fetchResponse != null
-        fetchResponse.getStatusCode() == HttpStatus.OK
-        fetchResponse.getBody().getCategory() == category
-        fetchResponse.getBody().getAmount() == amount
+        response != null
+        response.getStatusCode() == HttpStatus.OK
+        response.getBody().getCategory() == category
+        response.getBody().getAmount() == amount
 
         where:
         billNumber | category | amount

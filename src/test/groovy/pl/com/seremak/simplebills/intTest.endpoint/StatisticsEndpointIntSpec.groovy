@@ -6,7 +6,7 @@ import org.springframework.http.RequestEntity
 import org.springframework.http.ResponseEntity
 import pl.com.seremak.simplebills.dto.StatisticsDto
 
-import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
+import static pl.com.seremak.simplebills.intTest.endpoint.utils.EndpointSpecData.*
 
 class StatisticsEndpointIntSpec extends EndpointIntSpec {
 

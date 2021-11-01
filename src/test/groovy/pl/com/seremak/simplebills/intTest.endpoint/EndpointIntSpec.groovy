@@ -16,7 +16,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.stream.IntStream
 
-import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
+import static pl.com.seremak.simplebills.intTest.endpoint.utils.EndpointSpecData.*
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

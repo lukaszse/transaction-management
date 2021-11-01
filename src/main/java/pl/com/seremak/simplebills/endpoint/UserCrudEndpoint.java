@@ -33,24 +33,24 @@ public class UserCrudEndpoint {
     public Mono<ResponseEntity<String>> createUser(@Valid @RequestBody final User user) {
         log.info(USER_CREATION_REQUEST_RECEIVED_MESSAGE, user.getLogin());
         return userCrudService.createUser(user)
-                .map(this::createResponse)
-                .doOnSuccess(__ -> log.info(USER_CREATED_MESSAGE, user.getLogin()));
+                .doOnSuccess(__ -> log.info(USER_CREATED_MESSAGE, user.getLogin()))
+                .map(this::createResponse);
     }
 
     @GetMapping(value = "/admin/{login}", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<User>> getUserByLogin(@PathVariable final String login) {
         log.info(GET_USER_REQUEST_RECEIVED_MESSAGE, login);
         return userCrudService.getUserByLogin(login)
-                .map(ResponseEntity::ok)
-                .doOnSuccess(__ -> log.info(USER_FETCHED_MESSAGE, login));
+                .doOnSuccess(__ -> log.info(USER_FETCHED_MESSAGE, login))
+                .map(ResponseEntity::ok);
     }
 
-    @PatchMapping(value = "/change-password", produces = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/change-password", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Void>> changePassword(@Valid @RequestBody final PasswordDto passwordDto) {
         log.info(PASSWORD_CHANGE_REQUEST_MESSAGE, passwordDto.getUser());
         return userCrudService.changePassword(passwordDto)
-                .map(ResponseEntity::ok)
-                .doOnSuccess(__ -> log.info(PASSWORD_CHANGED_MESSAGE, passwordDto.getUser()));
+                .doOnSuccess(__ -> log.info(PASSWORD_CHANGED_MESSAGE, passwordDto.getUser()))
+                .map(ResponseEntity::ok);
     }
 
     private ResponseEntity<String> createResponse(final String id) {
