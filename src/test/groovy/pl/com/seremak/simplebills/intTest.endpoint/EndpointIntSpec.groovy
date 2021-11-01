@@ -1,0 +1,57 @@
+package pl.com.seremak.simplebills.intTest.endpoint
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.web.client.RestTemplate
+import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
+import pl.com.seremak.simplebills.repository.BillCrudRepository
+import pl.com.seremak.simplebills.repository.UserCrudRepository
+import spock.lang.Shared
+import spock.lang.Specification
+
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.stream.IntStream
+
+import static pl.com.seremak.simplebills.EndpointSpecData.*
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+class EndpointIntSpec extends Specification{
+
+    @LocalServerPort
+    protected int port;
+
+    @Autowired
+    StatisticsEndpoint statisticsEndpoint
+
+    @Autowired
+    BillCrudRepository billCrudRepository
+
+    @Autowired
+    UserCrudRepository userCrudRepository;
+
+    @Shared
+    RestTemplate client = new RestTemplate()
+
+    def setup() {
+        // populate database for tests
+        billCrudRepository.deleteAll().block()
+        IntStream.range(1, 10)
+                .forEach(i ->
+                        billCrudRepository.save(prepareBill(i, 10 * i, FOOD, Instant.now().minus(1 * i, ChronoUnit.DAYS))).block())
+        IntStream.range(11, 12)
+                .forEach(i ->
+                        billCrudRepository.save(prepareBill(i, 2666 * i, TRAVEL, Instant.now().minus(360 * i, ChronoUnit.DAYS))).block())
+        userCrudRepository.save(createTestUser()).block()
+    }
+
+    def cleanup() {
+        billCrudRepository.deleteAll().block()
+        userCrudRepository.deleteAll().block()
+    }
+}
