@@ -1,5 +1,6 @@
 package pl.com.seremak.simplebills.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,8 @@ import javax.validation.constraints.Pattern;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User  {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class User {
 
     @Id
     @NotBlank(message = "Login cannot be blank")

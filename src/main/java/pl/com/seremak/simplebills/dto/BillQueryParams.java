@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.endpoint.dto;
+package pl.com.seremak.simplebills.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

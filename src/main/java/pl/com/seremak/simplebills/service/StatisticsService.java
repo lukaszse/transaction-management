@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
-import pl.com.seremak.simplebills.endpoint.dto.StatisticsDto;
+import pl.com.seremak.simplebills.dto.BillQueryParams;
+import pl.com.seremak.simplebills.dto.StatisticsDto;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import reactor.core.publisher.Mono;
@@ -40,7 +40,9 @@ public class StatisticsService {
         return calculateSumForUserAndCategory(userName, params)
                 .zipWith(countByUserAndCategory(userName, params.getCategory()))
                 .map(tuple -> tuple.getT1().divide(tuple.getT2(), 2, RoundingMode.HALF_UP))
+                .onErrorReturn(ArithmeticException.class, BigDecimal.ZERO)
                 .doOnError(error -> log.error(MEAN_CALCULATION_ERROR, userName, error.getMessage()));
+
     }
 
     public Mono<StatisticsDto> getStatisticsForUser(final String userName, final BillQueryParams params) {
@@ -56,8 +58,8 @@ public class StatisticsService {
     }
 
     private Mono<BigDecimal> countByUserAndCategory(final String userName, final String category) {
-        return crudRepository.countByUserAndCategory(userName, category)
-                .map(BigDecimal::valueOf);
+        return category != null ?
+                crudRepository.countByUserAndCategory(userName, category).map(BigDecimal::valueOf) :
+                crudRepository.countByUser(userName).map(BigDecimal::valueOf);
     }
-
 }

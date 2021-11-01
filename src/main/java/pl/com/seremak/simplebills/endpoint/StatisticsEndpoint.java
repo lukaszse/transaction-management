@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
-import pl.com.seremak.simplebills.endpoint.dto.StatisticsDto;
+import pl.com.seremak.simplebills.dto.BillQueryParams;
+import pl.com.seremak.simplebills.dto.StatisticsDto;
 import pl.com.seremak.simplebills.service.StatisticsService;
 import reactor.core.publisher.Mono;
 

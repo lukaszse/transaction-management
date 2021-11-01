@@ -1,14 +1,9 @@
 package pl.com.seremak.simplebills.service.util;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import pl.com.seremak.simplebills.endpoint.dto.BillQueryParams;
-import pl.com.seremak.simplebills.model.Bill;
-import pl.com.seremak.simplebills.model.Metadata;
+import pl.com.seremak.simplebills.dto.BillQueryParams;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -51,7 +46,7 @@ public class ServiceCommons {
     }
 
     public static long calculateSkip(final BillQueryParams params) {
-        return (long) Optional.ofNullable(params.getPageSize()).orElse(0) * (Optional.ofNullable(params.getPageNumber()).orElse(0)-1);
+        return (long) Optional.ofNullable(params.getPageSize()).orElse(0) * (Optional.ofNullable(params.getPageNumber()).orElse(0) - 1);
     }
 
     public static long extractPageSize(BillQueryParams params) {

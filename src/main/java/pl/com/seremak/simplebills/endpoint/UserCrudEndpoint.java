@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.com.seremak.simplebills.endpoint.dto.PasswordDto;
+import pl.com.seremak.simplebills.dto.PasswordDto;
 import pl.com.seremak.simplebills.model.User;
 import pl.com.seremak.simplebills.service.UserCrudService;
 import reactor.core.publisher.Mono;
@@ -27,6 +27,7 @@ public class UserCrudEndpoint {
     public static final String USER_CREATED_MESSAGE = "User={} successfully created.";
     public static final String USER_CREATION_REQUEST_RECEIVED_MESSAGE = "User creation request received for user with login={}";
     private final UserCrudService userCrudService;
+
 
     @PostMapping(value = "/admin", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> createUser(@Valid @RequestBody final User user) {

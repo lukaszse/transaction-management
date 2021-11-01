@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.endpoint.dto.PasswordDto;
+import pl.com.seremak.simplebills.dto.PasswordDto;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Metadata;
 import pl.com.seremak.simplebills.model.User;

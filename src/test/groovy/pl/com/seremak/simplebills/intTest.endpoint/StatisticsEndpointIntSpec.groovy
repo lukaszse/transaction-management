@@ -63,6 +63,6 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
         category | expectedSumValue
         FOOD     | 50
         TRAVEL   | 2100
-//        CAR      | 0  // todo fix division by 0 error. Implement error handling in service and mapping to 400 (bad request)
+        CAR      | 0
     }
 }
