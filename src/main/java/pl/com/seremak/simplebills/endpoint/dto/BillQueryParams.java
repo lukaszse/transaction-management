@@ -6,13 +6,12 @@ import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillQueryParams {
-
+    
     @Nullable
     private String category;
     @Nullable
