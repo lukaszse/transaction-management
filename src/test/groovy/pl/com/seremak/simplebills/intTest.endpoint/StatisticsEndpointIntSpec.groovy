@@ -6,7 +6,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.http.ResponseEntity
 
-import static pl.com.seremak.simplebills.EndpointSpecData.*
+import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
+
 
 class StatisticsEndpointIntSpec extends EndpointIntSpec {
 

@@ -1,11 +1,9 @@
 package pl.com.seremak.simplebills.intTest.endpoint
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.client.RestTemplate
 import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
 import pl.com.seremak.simplebills.repository.BillCrudRepository
@@ -18,7 +16,8 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.stream.IntStream
 
-import static pl.com.seremak.simplebills.EndpointSpecData.*
+import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
