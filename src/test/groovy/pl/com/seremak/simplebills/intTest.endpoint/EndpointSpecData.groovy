@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills
+package pl.com.seremak.simplebills.intTest.endpoint
 
 import pl.com.seremak.simplebills.model.Bill
 import pl.com.seremak.simplebills.model.Metadata
