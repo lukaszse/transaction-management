@@ -69,7 +69,7 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> findBillById(final Mono<Principal> principal, @PathVariable final String billNumber) {
+    public Mono<ResponseEntity<Bill>> findBillByBillNumberForUser(final Mono<Principal> principal, @PathVariable final String billNumber) {
         return principal
                 .map(Principal::getName)
                 .doOnEach(userName -> log.info(FIND_BILL_REQUEST_MESSAGE, billNumber, userName))

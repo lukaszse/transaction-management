@@ -15,10 +15,13 @@ class EndpointSpecData {
     static def CAR = "CAR"
     static def AUTHORIZATION_HEADER_NAME = "Authorization"
     static def BASIC_TOKEN = "Basic dGVzdHVzZXI6MTIzNDU="
-    static def SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN = "http://localhost:%d/statistics/%s?category=%s"
+    static def SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN = "http://localhost:%d/statistics%s?category=%s"
+    static def SERVICE_URL_BILL_CRUD_PATTERN = "http://localhost:%d/bills%s"
+    static def FOOD_SHOPPING_DESCRIPTION = "Food shopping"
+    static def DESCRIPTION_PATTERN = "%s shopping"
 
 
-    static def prepareBill(
+    static def prepareBillForEndpointTest(
             final int billNumber,
             final int amount,
             final String category,
@@ -27,11 +30,24 @@ class EndpointSpecData {
         Bill.builder()
                 .amount(BigDecimal.valueOf(amount))
                 .billNumber(String.valueOf(billNumber))
+                .description(DESCRIPTION_PATTERN.formatted(category))
                 .category(category)
                 .date(Instant.now())
                 .user(TEST_USER)
                 .date(date)
                 .metadata(prepareMetadataNow())
+                .build()
+    }
+
+    static def prepareBillForEndpointTest(
+            final double amount,
+            final String category,
+            final Instant date) {
+
+        Bill.builder()
+                .amount(BigDecimal.valueOf(amount))
+                .category(category)
+                .description(FOOD_SHOPPING_DESCRIPTION)
                 .build()
     }
 

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
 import org.springframework.http.ResponseEntity
+import pl.com.seremak.simplebills.dto.StatisticsDto
 
 import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
 
@@ -20,10 +21,10 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
         bill.getCategory() == FOOD
     }
 
-    def 'should calculate sum for bills'() {
+    def 'should calculate sum for bills with given category'() {
         given: 'prepare request'
         def request =
-                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, "sum", category))
+                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, "/sum", category))
                         .accept(MediaType.APPLICATION_JSON)
                         .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
                         .build()
@@ -43,10 +44,10 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
         CAR      | 0
     }
 
-    def 'should calculate mean for bills'() {
+    def 'should calculate mean for bills with given category'() {
         given: 'prepare request'
         def request =
-                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, "mean", category))
+                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, "/mean", category))
                         .accept(MediaType.APPLICATION_JSON)
                         .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
                         .build()
@@ -64,5 +65,31 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
         FOOD     | 50
         TRAVEL   | 2100
         CAR      | 0
+    }
+
+    def 'should fetch statistics for bills with given category'() {
+        given: 'prepare request'
+        def request =
+                RequestEntity.get(SERVICE_URL_STATISTICS_WITH_CATEGORY_PATTERN.formatted(port, "/user-statistics", category))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
+                        .build()
+
+        when: 'call to service to to get mean value'
+        ResponseEntity<StatisticsDto> response = client.exchange(request, StatisticsDto.class)
+
+        then: 'result should match'
+        response != null
+        response.getStatusCode() == HttpStatus.OK
+        response.getBody().getCategory() == category
+        response.getBody().getSum() == expectedSum
+        response.getBody().getMean() == expectedMean
+
+
+        where: 'test data are'
+        category | expectedMean | expectedSum
+        FOOD     | 50           | 450
+        TRAVEL   | 2100         | 4200
+        CAR      | 0            | 0
     }
 }

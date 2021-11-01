@@ -21,7 +21,7 @@ import static pl.com.seremak.simplebills.intTest.endpoint.EndpointSpecData.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-class EndpointIntSpec extends Specification{
+class EndpointIntSpec extends Specification {
 
     @LocalServerPort
     protected int port
@@ -46,10 +46,10 @@ class EndpointIntSpec extends Specification{
         billCrudRepository.deleteAll().block()
         IntStream.range(1, 10)
                 .forEach(i ->
-                        billCrudRepository.save(prepareBill(i, 10 * i, FOOD, Instant.now().minus(1 * i, ChronoUnit.DAYS))).block())
+                        billCrudRepository.save(prepareBillForEndpointTest(i, 10 * i, FOOD, Instant.now().minus(1 * i, ChronoUnit.DAYS))).block())
         IntStream.range(10, 12)
                 .forEach(i ->
-                        billCrudRepository.save(prepareBill(i, 200 * i, TRAVEL, Instant.now().minus(360 * i, ChronoUnit.DAYS))).block())
+                        billCrudRepository.save(prepareBillForEndpointTest(i, 200 * i, TRAVEL, Instant.now().minus(360 * i, ChronoUnit.DAYS))).block())
         userCrudService.createUser(createTestUser()).block()
     }
 
