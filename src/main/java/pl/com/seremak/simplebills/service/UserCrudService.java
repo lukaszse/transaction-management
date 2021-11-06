@@ -11,6 +11,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.dto.PasswordDto;
+import pl.com.seremak.simplebills.exceptions.ConflictException;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Metadata;
 import pl.com.seremak.simplebills.model.User;
@@ -31,13 +32,15 @@ public class UserCrudService {
     public static final String USER_NOT_FIND_ERROR_MESSAGE = "Cannot find user with login={}. Error={}";
     public static final String PASSWORD_CHANGE_ERROR_MESSAGE = "Some errors while password changing occurred. Error={}";
     public static final String PASSWORD_NOT_MATCHING_ERROR_MESSAGE = "Password for user=%s is not matching";
+    public static final String USER_EXIST_ERROR_MESSAGE = "User with login=%s already exists";
 
     private final UserCrudRepository userCrudRepository;
     private final ReactiveMongoTemplate mongoTemplate;
 
 
     public Mono<String> createUser(final User user) {
-        return userCrudRepository.save(setMetadataAndEncodePassword(user))
+        return userCrudRepository.existsById(user.getLogin())
+                .flatMap(exists -> saveUser(user, exists))
                 .map(theUser -> user.getLogin())
                 .doOnError(error -> log.error(USER_CREATION_ERROR_MESSAGE, error.getMessage()));
     }
@@ -50,7 +53,12 @@ public class UserCrudService {
     public Mono<Void> changePassword(final PasswordDto passwordDto) {
         return isPasswordMatching(passwordDto)
                 .flatMap(isPasswordMatching -> updateIfPasswordMatching(passwordDto, isPasswordMatching));
+    }
 
+    private Mono<User> saveUser(final User user, final boolean exists) {
+        return exists ?
+                Mono.error(new ConflictException(USER_EXIST_ERROR_MESSAGE.formatted(user.getLogin()))) :
+                userCrudRepository.save(setMetadataAndEncodePassword(user));
     }
 
     private Mono<Void> updateIfPasswordMatching(final PasswordDto passwordDto, final boolean isPasswordMatching) {

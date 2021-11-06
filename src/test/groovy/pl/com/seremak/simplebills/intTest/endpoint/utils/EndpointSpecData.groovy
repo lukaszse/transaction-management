@@ -80,7 +80,8 @@ class EndpointSpecData {
         Map.of(
                 "user", TEST_USER,
                 "oldPassword", TEST_PASSWORD,
-                "newPassword", "12345"
+                "newPassword", "12345",
+                "confirmNewPassword", "12345"
         )
     }
 }

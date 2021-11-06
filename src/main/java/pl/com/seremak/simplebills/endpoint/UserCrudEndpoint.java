@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.dto.PasswordDto;
+import pl.com.seremak.simplebills.exceptions.WrongPayloadException;
 import pl.com.seremak.simplebills.model.User;
 import pl.com.seremak.simplebills.service.UserCrudService;
 import reactor.core.publisher.Mono;
@@ -48,6 +49,7 @@ public class UserCrudEndpoint {
     @PutMapping(value = "/change-password", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Void>> changePassword(@Valid @RequestBody final PasswordDto passwordDto) {
         log.info(PASSWORD_CHANGE_REQUEST_MESSAGE, passwordDto.getUser());
+        validatePassword(passwordDto);
         return userCrudService.changePassword(passwordDto)
                 .doOnSuccess(__ -> log.info(PASSWORD_CHANGED_MESSAGE, passwordDto.getUser()))
                 .map(ResponseEntity::ok);
@@ -56,5 +58,11 @@ public class UserCrudEndpoint {
     private ResponseEntity<String> createResponse(final String id) {
         return ResponseEntity.created(URI.create(String.format("/users/%s", id)))
                 .body(id);
+    }
+
+    private void validatePassword(final PasswordDto passwordDto) {
+        if (!passwordDto.getNewPassword().equals(passwordDto.getConfirmNewPassword())) {
+            throw new WrongPayloadException("New password and confirmed password are not the same");
+        }
     }
 }
