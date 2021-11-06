@@ -40,7 +40,7 @@ class EndpointIntSpec extends Specification {
     UserCrudService userCrudService
 
     @Autowired
-    SequentialIdService sequentialIdService;
+    SequentialIdService sequentialIdService
 
     @Shared
     def client = new RestTemplate()
@@ -65,7 +65,7 @@ class EndpointIntSpec extends Specification {
     def cleanup() {
         billCrudRepository.deleteAll().block()
         userCrudRepository.deleteAll().block()
-        sequentialIdService.deleteUser(TEST_USER)
-        sequentialIdService.deleteUser(TEST_USER_2)
+        sequentialIdService.deleteUser(TEST_USER).block()
+        sequentialIdService.deleteUser(TEST_USER_2).block()
     }
 }
