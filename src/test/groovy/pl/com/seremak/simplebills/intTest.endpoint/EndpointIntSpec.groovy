@@ -1,5 +1,6 @@
 package pl.com.seremak.simplebills.intTest.endpoint
 
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
@@ -20,6 +21,7 @@ import java.util.stream.IntStream
 
 import static pl.com.seremak.simplebills.intTest.endpoint.utils.EndpointSpecData.*
 
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class EndpointIntSpec extends Specification {
@@ -51,6 +53,8 @@ class EndpointIntSpec extends Specification {
     def setup() {
         // populate database for tests
         billCrudRepository.deleteAll().block()
+        userCrudRepository.deleteAll().block()
+        tryToCleanSequentialIdRepository()
         IntStream.range(1, 10)
                 .forEach(i ->
                         billCrudRepository.save(prepareBillForEndpointTest(i, 10 * i, FOOD, Instant.now().minus(1 * i, ChronoUnit.DAYS))).block())
@@ -65,7 +69,19 @@ class EndpointIntSpec extends Specification {
     def cleanup() {
         billCrudRepository.deleteAll().block()
         userCrudRepository.deleteAll().block()
-        sequentialIdService.deleteUser(TEST_USER).block()
-        sequentialIdService.deleteUser(TEST_USER_2).block()
+        tryToCleanSequentialIdRepository()
+    }
+
+    def tryToCleanSequentialIdRepository() {
+        try {
+            sequentialIdService.deleteUser(TEST_USER).block()
+        } catch (Exception ex) {
+            log.info("Error occurred while cleaning up: {}, {}", ex.getMessage(), ex.getCause())
+        }
+        try {
+            sequentialIdService.deleteUser(TEST_USER_2).block()
+        } catch (Exception ex) {
+            log.info("Error occurred while cleaning up: {}, {}", ex.getMessage(), ex.getCause())
+        }
     }
 }
