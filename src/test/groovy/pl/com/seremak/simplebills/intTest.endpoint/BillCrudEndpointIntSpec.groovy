@@ -18,7 +18,7 @@ class BillCrudEndpointIntSpec extends EndpointIntSpec {
         def creationRequest =
                 RequestEntity.post(SERVICE_URL_BILL_CRUD_PATTERN.formatted(port, StringUtils.EMPTY))
                         .accept(MediaType.APPLICATION_JSON)
-                        .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
+                        .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN_TEST_USER_2)
                         .body(prepareBillForEndpointTest(100, FOOD, Instant.now()))
 
 

@@ -62,9 +62,9 @@ class EndpointSpecData {
                 .build()
     }
 
-    static def createTestUser() {
+    static def createTestUser(final String userName) {
         User.builder()
-                .login(TEST_USER)
+                .login(userName)
                 .password(TEST_PASSWORD)
                 .build()
     }
