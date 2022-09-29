@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @Slf4j
+@CrossOrigin
 @RestController
 @RequestMapping("/bills")
 @RequiredArgsConstructor
@@ -33,7 +35,6 @@ public class BillCrudEndpoint {
     public static final String BILL_CREATED_MESSAGE = "Bill for user={} with number={} successfully created";
     public static final String FIND_BILL_REQUEST_MESSAGE = "Find bill with number={} for user={}";
     public static final String FIND_BILLS_REQUEST_MESSAGE = "Find bills with category={} for user={}";
-
     public static final String BILL_FOUND_MESSAGE = "Bill with number={} for user={} successfully found.";
     public static final String BILLS_FETCHED_MESSAGE = "List of bills successfully fetched.";
     public static final String DELETE_BILL_REQUEST_MESSAGE = "Bill delete request for user={} and billNumber={}";
@@ -53,7 +54,7 @@ public class BillCrudEndpoint {
                 .map(Principal::getName)
                 .map(name -> hello.formatted(name))
                 .doOnSuccess(__ -> log.info(HELLO_SUCCESSFULLY_SAID_MESSAGE))
-                .map(ResponseEntity::ok);
+                .map(response -> ResponseEntity.ok().headers(prepareXTotalCountHeader(1L)).body(response));
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
@@ -118,6 +119,7 @@ public class BillCrudEndpoint {
     private HttpHeaders prepareXTotalCountHeader(final Long count) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(X_TOTAL_COUNT_HEADER, String.valueOf(count));
+        headers.setAccessControlAllowOrigin("*");
         return headers;
     }
 }

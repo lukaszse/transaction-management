@@ -15,9 +15,10 @@ public class SpringSecurity {
             ServerHttpSecurity http) {
         return http.authorizeExchange()
                 .pathMatchers("/users/admin", "/users/admin/*").hasAuthority("ROLE_ADMIN")
-                .anyExchange().authenticated()
+                .anyExchange().permitAll()
                 .and().httpBasic()
-                .and().csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .and().cors().disable()
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
 }

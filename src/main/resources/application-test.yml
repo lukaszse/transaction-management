@@ -1,7 +1,10 @@
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration,org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   data:
     mongodb:
-      database: test-simple-bills
+      database: simple-bills
+      uri: mongodb://192.168.55.210:27017
 
 #custom
 hello: "Hello in my application"
