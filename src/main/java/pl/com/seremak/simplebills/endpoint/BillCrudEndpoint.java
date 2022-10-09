@@ -1,10 +1,17 @@
 package pl.com.seremak.simplebills.endpoint;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.model.Bill;
@@ -15,7 +22,10 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.http.HttpResponse;
 import java.security.Principal;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -83,7 +93,7 @@ public class BillCrudEndpoint {
     public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, BillQueryParams params) {
 
         return principal
-                .map(Principal::getName)
+                .map(BillCrudEndpoint::extractUserName)
                 .doOnEach(userName -> log.info(FIND_BILLS_REQUEST_MESSAGE, params.getCategory(), userName))
                 .flatMap(userName -> service.findBillsByCategoryForUser(userName, params))
                 .doOnSuccess(__ -> log.info(BILLS_FETCHED_MESSAGE))
@@ -121,5 +131,23 @@ public class BillCrudEndpoint {
         headers.set(X_TOTAL_COUNT_HEADER, String.valueOf(count));
         headers.setAccessControlAllowOrigin("*");
         return headers;
+    }
+
+    private static String extractUserName(final Principal principal) {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Base64.Decoder decoder = Base64.getUrlDecoder();
+        final JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) principal;
+        final String tokenValue = jwtAuthenticationToken.getToken().getTokenValue();
+        final String encodedTokenPayload = tokenValue.split("\\.")[1];
+        final String decodedTokenPayload = new String(decoder.decode(encodedTokenPayload));
+        final HashMap<String, Object> tokenPayloadMap;
+        try {
+            tokenPayloadMap = objectMapper.readValue(decodedTokenPayload, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        final String username =  (String) tokenPayloadMap.get("preferred_username");
+        return username;
     }
 }
