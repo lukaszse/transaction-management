@@ -4,13 +4,7 @@ spring:
   data:
     mongodb:
       database: simple-bills
-      uri: mongodb+srv://simple:bills@cluster0.i30j4gd.mongodb.net/?retryWrites=true&w=majority
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8085/realms/baeldung
-          jwk-set-uri: http://localhost:8085/realms/baeldung/protocol/openid-connect/certs
+      uri: mongodb://mongodb:27017
 
 server:
   error:

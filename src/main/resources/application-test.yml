@@ -4,7 +4,6 @@ spring:
   data:
     mongodb:
       database: simple-bills
-      uri: mongodb://192.168.55.210:27017
 
 #custom
 hello: "Hello in my application"
