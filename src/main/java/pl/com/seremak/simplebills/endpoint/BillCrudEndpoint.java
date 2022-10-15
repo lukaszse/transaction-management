@@ -5,12 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
@@ -20,12 +18,10 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.net.http.HttpResponse;
 import java.security.Principal;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -90,10 +86,11 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Mono<Principal> principal, BillQueryParams params) {
+    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Principal principal,
+                                                                   Authentication authentication,
+                                                                   BillQueryParams params) {
 
-        return principal
-                .map(BillCrudEndpoint::extractUserName)
+        return extractUserName(principal)
                 .doOnEach(userName -> log.info(FIND_BILLS_REQUEST_MESSAGE, params.getCategory(), userName))
                 .flatMap(userName -> service.findBillsByCategoryForUser(userName, params))
                 .doOnSuccess(__ -> log.info(BILLS_FETCHED_MESSAGE))
@@ -129,11 +126,10 @@ public class BillCrudEndpoint {
     private HttpHeaders prepareXTotalCountHeader(final Long count) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(X_TOTAL_COUNT_HEADER, String.valueOf(count));
-        headers.setAccessControlAllowOrigin("*");
         return headers;
     }
 
-    private static String extractUserName(final Principal principal) {
+    private static Mono<String> extractUserName(final Principal principal) {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Base64.Decoder decoder = Base64.getUrlDecoder();
         final JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) principal;
@@ -148,6 +144,6 @@ public class BillCrudEndpoint {
             throw new RuntimeException(e);
         }
         final String username =  (String) tokenPayloadMap.get("preferred_username");
-        return username;
+        return Mono.just(username);
     }
 }
