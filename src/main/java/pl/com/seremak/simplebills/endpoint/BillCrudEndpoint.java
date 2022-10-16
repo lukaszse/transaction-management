@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.service.BillService;
-import pl.com.seremak.simplebills.util.JwtUtils;
+import pl.com.seremak.simplebills.util.JwtExtractionHelper;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,11 +43,12 @@ public class BillCrudEndpoint {
     public static final String BILL_UPDATED_MESSAGE = "Bill with user={} and billNumber={} successfully update.";
     public static final String BILL_URI_PATTERN = "/bills/%s";
     private final BillService service;
+    private final JwtExtractionHelper jwtExtractionHelper;
 
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> createBill(@AuthenticationPrincipal final JwtAuthenticationToken principal, @Valid @RequestBody final Bill bill) {
-        final String username = JwtUtils.extractUsername(principal);
+        final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(BILL_CREATION_RECEIVED_MESSAGE, username);
         return service.createBill(username, bill)
                 .doOnSuccess(createdBill -> log.info(BILL_CREATED_MESSAGE, createdBill.getUser(), createdBill.getBillNumber()))
@@ -58,7 +58,7 @@ public class BillCrudEndpoint {
 
     @GetMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Bill>> findBillByBillNumberForUser(final JwtAuthenticationToken principal, @PathVariable final String billNumber) {
-        final String username = JwtUtils.extractUsername(principal);
+        final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(FIND_BILL_REQUEST_MESSAGE, billNumber, username);
         return service.findBillByBillNumberForUser(username, billNumber)
                 .doOnSuccess(bill -> log.info(BILL_FOUND_MESSAGE, bill.getBillNumber(), bill.getUser()))
@@ -68,7 +68,7 @@ public class BillCrudEndpoint {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final JwtAuthenticationToken principal, final BillQueryParams params) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final String username = JwtUtils.extractUsername(principal);
+        final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(FIND_BILLS_REQUEST_MESSAGE, Optional.ofNullable(params.getCategory()).orElse("All categories"), username);
         return service.findBillsByCategoryForUser(username, params)
                 .doOnSuccess(__ -> log.info(BILLS_FETCHED_MESSAGE))
@@ -77,7 +77,7 @@ public class BillCrudEndpoint {
 
     @DeleteMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
     public Mono<Object> deleteBill(final JwtAuthenticationToken principal, @PathVariable final String billNumber) {
-        final String username = JwtUtils.extractUsername(principal);
+        final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_BILL_REQUEST_MESSAGE, username, billNumber);
         return service.deleteBillByBillNumberForUser(username, billNumber)
                 .doOnSuccess(bill -> log.info(BILL_DELETED_MESSAGE, bill.getUser(), bill.getBillNumber()))
@@ -86,7 +86,7 @@ public class BillCrudEndpoint {
 
     @PatchMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Bill>> updateBill(final JwtAuthenticationToken principal, @RequestBody final Bill bill, @PathVariable final String billNumber) {
-        final String username = JwtUtils.extractUsername(principal);
+        final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_UPDATE_REQUEST_MESSAGE, username, billNumber);
         return service.updateBillNumber(username, bill)
                 .doOnSuccess(theBill -> log.info(BILL_UPDATED_MESSAGE, theBill.getUser(), theBill.getBillNumber()))

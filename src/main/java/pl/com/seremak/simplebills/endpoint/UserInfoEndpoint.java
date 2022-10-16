@@ -3,37 +3,32 @@ package pl.com.seremak.simplebills.endpoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import pl.com.seremak.simplebills.dto.BillQueryParams;
-import pl.com.seremak.simplebills.dto.UserInfoDto;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.bind.annotation.*;
+import pl.com.seremak.simplebills.dto.UserDto;
 import pl.com.seremak.simplebills.service.StatisticsService;
-import pl.com.seremak.simplebills.service.UserCrudService;
+import pl.com.seremak.simplebills.util.JwtExtractionHelper;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
+@CrossOrigin
 @RestController
-@RequestMapping("/users-info")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserInfoEndpoint {
 
-    public static final String USER_INFO_FETCHED_MESSAGE = "User info for user={} successfully fetched.";
-    public static final String USER_INFO_REQUEST_RECEIVED_MESSAGE = "User info request received for user={}";
+    public static final String USER_INFO_FETCHED_MESSAGE = "User info for user={} successfully extracted from token.";
+    public static final String USER_INFO_REQUEST_RECEIVED_MESSAGE = "Extracting information about user from jwt token with sub={}";
     private final StatisticsService statisticsService;
-    private final UserCrudService userCrudService;
+    private final JwtExtractionHelper jwtExtractionHelper;
 
-    @GetMapping(value = "/{userName}", produces = APPLICATION_JSON_VALUE)
-    Mono<ResponseEntity<UserInfoDto>> getInfoAboutUser(@PathVariable final String userName, final BillQueryParams params) {
-        log.info(USER_INFO_REQUEST_RECEIVED_MESSAGE, userName);
-        return userCrudService
-                .getUserByLogin(userName)
-                .zipWith(statisticsService.getStatisticsForUser(userName, params))
-                .map(UserInfoDto::of)
-                .doOnSuccess(__ -> log.info(USER_INFO_FETCHED_MESSAGE, userName))
-                .map(ResponseEntity::ok);
+    @GetMapping(value = "/user-info", produces = APPLICATION_JSON_VALUE)
+    Mono<ResponseEntity<UserDto>> getInfoAboutUser(final JwtAuthenticationToken principal) {
+        log.info(USER_INFO_REQUEST_RECEIVED_MESSAGE, principal.getToken());
+            return Mono.just(jwtExtractionHelper.extractUser(principal))
+                    .doOnSuccess(username -> log.info(USER_INFO_FETCHED_MESSAGE, username.getPreferredUsername()))
+                    .map(ResponseEntity::ok);
     }
 }

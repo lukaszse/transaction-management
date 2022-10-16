@@ -8,9 +8,9 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestTemplate
 import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
 import pl.com.seremak.simplebills.repository.BillCrudRepository
-import pl.com.seremak.simplebills.repository.UserCrudRepository
+
 import pl.com.seremak.simplebills.service.SequentialIdService
-import pl.com.seremak.simplebills.service.UserCrudService
+
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
