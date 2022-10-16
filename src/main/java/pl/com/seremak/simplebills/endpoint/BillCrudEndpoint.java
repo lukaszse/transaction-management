@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.model.Bill;
@@ -64,7 +65,7 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final Principal principal, final BillQueryParams params) {
+    public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final JwtAuthenticationToken principal, final BillQueryParams params) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final String username = JwtUtils.extractUsername(authentication);
         log.info(FIND_BILLS_REQUEST_MESSAGE, Optional.ofNullable(params.getCategory()).orElse("All categories"), username);

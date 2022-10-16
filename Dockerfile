@@ -8,11 +8,3 @@ EXPOSE 443
 RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
 ENTRYPOINT ["java", "-jar" ,"/app/spring-boot-application.jar"]
-
-#FROM openjdk:17-jdk-alpine
-#RUN addgroup -S carrental && adduser -S carrental -G carrental
-#WORKDIR /simple-bills/
-#ARG JAR_FILE=build/libs/*.jar
-#COPY ${JAR_FILE} app.jar
-#EXPOSE 443
-#ENTRYPOINT ["java","-jar","app.jar"]

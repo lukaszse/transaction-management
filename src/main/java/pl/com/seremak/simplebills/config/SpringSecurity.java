@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.server.resource.web.server.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -32,13 +34,14 @@ public class SpringSecurity {
                 .pathMatchers("/users/admin", "/users/admin/*").hasAuthority("ROLE_ADMIN")
                 .anyExchange().permitAll()
                 .and()
-                .oauth2ResourceServer().jwt()
+                .oauth2ResourceServer().bearerTokenConverter(bearerTokenConverter())
+                .jwt()
                 .and().and()
                 .build();
     }
 
     @Bean
-    CorsConfigurationSource corsConfiguration() {
+    public CorsConfigurationSource corsConfiguration() {
         final CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.applyPermitDefaultValues();
         corsConfig.addAllowedMethod(HttpMethod.PUT);
@@ -48,4 +51,11 @@ public class SpringSecurity {
         source.registerCorsConfiguration("/**", corsConfig);
         return source;
     }
+
+    private ServerAuthenticationConverter bearerTokenConverter() {
+        ServerBearerTokenAuthenticationConverter authenticationConverter = new ServerBearerTokenAuthenticationConverter();
+        authenticationConverter.setAllowUriQueryParameter(true);
+        return authenticationConverter;
+    }
+
 }
