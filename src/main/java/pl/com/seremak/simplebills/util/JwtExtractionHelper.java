@@ -10,37 +10,22 @@ import pl.com.seremak.simplebills.dto.UserDto;
 import pl.com.seremak.simplebills.exceptions.JwtTokenParsingException;
 
 import java.util.Base64;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class JwtExtractionHelper {
 
     private final ObjectMapper objectMapper;
-    private static final Base64.Decoder decoder = Base64.getUrlDecoder();
-    public static final String JWT_TOKEN_PARSING_EXCEPTION = "Error while parsing JWT token.";
-
 
 
     public String extractUsername(final JwtAuthenticationToken jwtAuthenticationToken) {
-        return extractUsername(jwtAuthenticationToken.getToken().getTokenValue());
-    }
-
-    public String extractUsername(final String jwtTokenStr) {
-        return extractUser(jwtTokenStr).getPreferredUsername();
+        return extractUser(jwtAuthenticationToken).getPreferredUsername();
     }
 
     public UserDto extractUser(final JwtAuthenticationToken jwtAuthenticationToken) {
-        return extractUser(jwtAuthenticationToken.getToken().getTokenValue());
-    }
-
-    public UserDto extractUser(final String jwtTokenStr) {
-        try {
-            final String encodedTokenPayload = jwtTokenStr.split("\\.")[1];
-            final String decodedTokenPayload = new String(decoder.decode(encodedTokenPayload));
-            return objectMapper.readValue(decodedTokenPayload, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new JwtTokenParsingException(JWT_TOKEN_PARSING_EXCEPTION, e);
-        }
+        final Map<String, Object> claims = jwtAuthenticationToken.getToken().getClaims();
+        return objectMapper.convertValue(claims, new TypeReference<>() {
+        });
     }
 }
