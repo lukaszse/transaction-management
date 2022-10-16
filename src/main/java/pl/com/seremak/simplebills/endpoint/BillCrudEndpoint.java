@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,7 @@ public class BillCrudEndpoint {
 
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> createBill(final Principal principal, @Valid @RequestBody final Bill bill) {
+    public Mono<ResponseEntity<String>> createBill(@AuthenticationPrincipal final JwtAuthenticationToken principal, @Valid @RequestBody final Bill bill) {
         final String username = JwtUtils.extractUsername(principal);
         log.info(BILL_CREATION_RECEIVED_MESSAGE, username);
         return service.createBill(username, bill)
@@ -56,7 +57,7 @@ public class BillCrudEndpoint {
     }
 
     @GetMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> findBillByBillNumberForUser(final Principal principal, @PathVariable final String billNumber) {
+    public Mono<ResponseEntity<Bill>> findBillByBillNumberForUser(final JwtAuthenticationToken principal, @PathVariable final String billNumber) {
         final String username = JwtUtils.extractUsername(principal);
         log.info(FIND_BILL_REQUEST_MESSAGE, billNumber, username);
         return service.findBillByBillNumberForUser(username, billNumber)
@@ -67,7 +68,7 @@ public class BillCrudEndpoint {
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<List<Bill>>> findAllBillsByCategory(final JwtAuthenticationToken principal, final BillQueryParams params) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final String username = JwtUtils.extractUsername(authentication);
+        final String username = JwtUtils.extractUsername(principal);
         log.info(FIND_BILLS_REQUEST_MESSAGE, Optional.ofNullable(params.getCategory()).orElse("All categories"), username);
         return service.findBillsByCategoryForUser(username, params)
                 .doOnSuccess(__ -> log.info(BILLS_FETCHED_MESSAGE))
@@ -75,7 +76,7 @@ public class BillCrudEndpoint {
     }
 
     @DeleteMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
-    public Mono<Object> deleteBill(final Principal principal, @PathVariable final String billNumber) {
+    public Mono<Object> deleteBill(final JwtAuthenticationToken principal, @PathVariable final String billNumber) {
         final String username = JwtUtils.extractUsername(principal);
         log.info(DELETE_BILL_REQUEST_MESSAGE, username, billNumber);
         return service.deleteBillByBillNumberForUser(username, billNumber)
@@ -84,7 +85,7 @@ public class BillCrudEndpoint {
     }
 
     @PatchMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> updateBill(final Principal principal, @RequestBody final Bill bill, @PathVariable final String billNumber) {
+    public Mono<ResponseEntity<Bill>> updateBill(final JwtAuthenticationToken principal, @RequestBody final Bill bill, @PathVariable final String billNumber) {
         final String username = JwtUtils.extractUsername(principal);
         log.info(DELETE_UPDATE_REQUEST_MESSAGE, username, billNumber);
         return service.updateBillNumber(username, bill)

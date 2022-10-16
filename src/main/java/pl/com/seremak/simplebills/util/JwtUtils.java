@@ -17,10 +17,9 @@ public class JwtUtils {
     public static final String JWT_TOKEN_PARSING_EXCEPTION = "Error while parsing JWT token.";
 
 
-    public static String extractUsername(final Principal principal) {
+    public static String extractUsername(final JwtAuthenticationToken jwtAuthenticationToken) {
         final HashMap<String, Object> tokenPayloadMap;
         try {
-            final JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) principal;
             final String tokenValue = jwtAuthenticationToken.getToken().getTokenValue();
             final String encodedTokenPayload = tokenValue.split("\\.")[1];
             final String decodedTokenPayload = new String(decoder.decode(encodedTokenPayload));
