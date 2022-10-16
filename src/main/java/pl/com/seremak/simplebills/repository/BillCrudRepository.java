@@ -10,12 +10,8 @@ import reactor.core.publisher.Mono;
 public interface BillCrudRepository extends ReactiveCrudRepository<Bill, String> {
 
     Flux<Bill> findByUserAndCategory(final String user, final String category);
-
     Mono<Bill> deleteByUserAndBillNumber(final String user, final String billNumber);
-
     Mono<Bill> findByUserAndBillNumber(final String user, final String billNumber);
-
     Mono<Long> countByUserAndCategory(final String user, final String category);
-
     Mono<Long> countByUser(final String user);
 }

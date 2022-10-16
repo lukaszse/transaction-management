@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.service.dto;
+package pl.com.seremak.simplebills.dto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

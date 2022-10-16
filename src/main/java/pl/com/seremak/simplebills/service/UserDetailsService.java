@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.service.dto.MyUserPrincipal;
+import pl.com.seremak.simplebills.dto.MyUserPrincipal;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.repository.UserCrudRepository;
 import reactor.core.publisher.Mono;

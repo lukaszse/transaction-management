@@ -20,8 +20,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
-import static pl.com.seremak.simplebills.service.util.ServiceCommons.ID_FIELD;
-import static pl.com.seremak.simplebills.service.util.ServiceCommons.updateMetadata;
+import static pl.com.seremak.simplebills.util.ServiceCommons.ID_FIELD;
+import static pl.com.seremak.simplebills.util.ServiceCommons.updateMetadata;
 
 @Slf4j
 @Service

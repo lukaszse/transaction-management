@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.service.util;
+package pl.com.seremak.simplebills.util;
 
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
