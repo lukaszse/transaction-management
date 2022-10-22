@@ -31,7 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class BillCrudEndpoint {
 
     public static final String BILL_CREATION_RECEIVED_MESSAGE = "Received bill creation request from user={}";
-    public static final String X_TOTAL_COUNT_HEADER = "XTotalCount";
+    public static final String X_TOTAL_COUNT_HEADER = "x-total-count";
     public static final String BILL_CREATED_MESSAGE = "Bill for user={} with number={} successfully created";
     public static final String FIND_BILL_REQUEST_MESSAGE = "Find bill with number={} for user={}";
     public static final String FIND_BILLS_REQUEST_MESSAGE = "Find bills with category={} for user={}";
@@ -101,6 +101,7 @@ public class BillCrudEndpoint {
     private static HttpHeaders prepareXTotalCountHeader(final Long count) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(X_TOTAL_COUNT_HEADER, String.valueOf(count));
+        headers.set(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, X_TOTAL_COUNT_HEADER);
         return headers;
     }
 }
