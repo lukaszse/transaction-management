@@ -20,9 +20,10 @@ public class BillQueryParams {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateTo;
 
-    private Integer pageSize;
+    private Integer pageSize = 10;
+    private Integer pageNumber = 1;
+    private SortDirection sortDirection = SortDirection.DESC;
+    private String sortColumn = "billNumber";
 
-    private Integer pageNumber;
-    private SortDirection sortDirection;
     private String searchTerm;
 }

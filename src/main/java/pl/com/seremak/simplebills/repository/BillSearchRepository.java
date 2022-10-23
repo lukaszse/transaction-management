@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-import static pl.com.seremak.simplebills.util.MongoQueryUtils.*;
+import static pl.com.seremak.simplebills.util.BillQueryUtils.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,13 +29,13 @@ public class BillSearchRepository {
 
     public Flux<Bill> find(final String username, final BillQueryParams params) {
         return mongoTemplate.find(
-                        prepareFindBillByUserAndCategoryQueryPageable(username, params),
+                        prepareFindByCategoryQueryPageable(username, params),
                         Bill.class);
     }
 
     public Mono<Long> count(final String username, final BillQueryParams params) {
         return mongoTemplate.count(
-                prepareFindBillByUserAndCategoryQuery(username, params),
+                prepareFindByCategoryQuery(username, params),
                 Bill.class);
     }
 

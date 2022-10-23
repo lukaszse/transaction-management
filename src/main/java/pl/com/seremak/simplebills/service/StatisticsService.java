@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static pl.com.seremak.simplebills.util.MongoQueryUtils.prepareFindBillByUserAndCategoryQuery;
+import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQuery;
 
 @Slf4j
 @Service
@@ -29,7 +29,7 @@ public class StatisticsService {
 
     public Mono<BigDecimal> calculateSumForUserAndCategory(final String userName, final BillQueryParams params) {
         return mongoTemplate.find(
-                        prepareFindBillByUserAndCategoryQuery(userName, params),
+                        prepareFindByCategoryQuery(userName, params),
                         Bill.class)
                 .map(Bill::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)

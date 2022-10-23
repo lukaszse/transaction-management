@@ -1,5 +1,6 @@
 package pl.com.seremak.simplebills.util;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -11,7 +12,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-public class MongoQueryUtils {
+public class BillQueryUtils {
 
     public static final String MODIFIED_AT_FIELD = "metadata.modifiedAt";
     public static final String VERSION_FIELD = "metadata.version";
@@ -19,6 +20,7 @@ public class MongoQueryUtils {
     public static final String DATE_FIELD = "date";
     public static final String USER_FIELD = "user";
     public static final int DEFAULT_PAGE_SIZE = 1000;
+    public static final String DEFAULT_SORTING_COLUMN = "billNumber";
 
 
     public static Update updateMetadata(final Update update) {
@@ -27,15 +29,17 @@ public class MongoQueryUtils {
                 .inc(VERSION_FIELD, 1);
     }
 
-    public static Query prepareFindBillByUserAndCategoryQueryPageable(final String userName, final BillQueryParams params) {
+    @SuppressWarnings("all")
+    public static Query prepareFindByCategoryQueryPageable(final String userName, final BillQueryParams params) {
         Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
         if (params.getCategory() != null) query.addCriteria(Criteria.where(CATEGORY_FIELD).is(params.getCategory()));
         query.skip(calculateSkip(params));
         query.limit((int) extractPageSize(params));
+        query.with(Sort.by(extractDirection(params), extractSortingColumn(params)));
         return addBetweenDatesCriteria(params, query);
     }
 
-    public static Query prepareFindBillByUserAndCategoryQuery(final String userName, final BillQueryParams params) {
+    public static Query prepareFindByCategoryQuery(final String userName, final BillQueryParams params) {
         Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
         if (params.getCategory() != null) query.addCriteria(Criteria.where(CATEGORY_FIELD).is(params.getCategory()));
         return addBetweenDatesCriteria(params, query);
@@ -60,7 +64,7 @@ public class MongoQueryUtils {
 
     private static Optional<Instant> getToInstantUTC(LocalDate localDate) {
         return Optional.ofNullable(localDate)
-                        .map(presentLocalDate -> presentLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
+                .map(presentLocalDate -> presentLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
     }
 
     public static long calculateSkip(final BillQueryParams params) {
@@ -69,5 +73,18 @@ public class MongoQueryUtils {
 
     public static long extractPageSize(BillQueryParams params) {
         return (long) Optional.ofNullable(params.getPageSize()).orElse(DEFAULT_PAGE_SIZE);
+    }
+
+    private static Sort.Direction extractDirection(final BillQueryParams params) {
+        return Optional.ofNullable(params.getSortDirection())
+                .map(Enum::toString)
+                .map(String::toUpperCase)
+                .map(Sort.Direction::valueOf)
+                .orElse(Sort.Direction.DESC);
+    }
+
+    private static String extractSortingColumn(final BillQueryParams params) {
+        return Optional.ofNullable(params.getSortColumn())
+                .orElse(DEFAULT_SORTING_COLUMN);
     }
 }

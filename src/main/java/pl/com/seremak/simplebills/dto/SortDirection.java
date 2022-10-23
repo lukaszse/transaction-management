@@ -7,10 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SortDirection {
 
-    ASC("asc"),
-    DESC("desc");
-
-    private final String name;
+    ASC,
+    DESC;
 
     public SortDirection of(final String name) {
         return SortDirection.valueOf(name.toUpperCase());
