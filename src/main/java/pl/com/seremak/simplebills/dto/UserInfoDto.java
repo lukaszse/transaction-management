@@ -9,7 +9,7 @@ import pl.com.seremak.simplebills.model.User;
 import reactor.util.function.Tuple2;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -23,8 +23,8 @@ public class UserInfoDto {
     private String lastName;
     private BigDecimal sum;
     private BigDecimal mean;
-    private Instant periodFrom;
-    private Instant periodTo;
+    private LocalDate periodFrom;
+    private LocalDate periodTo;
 
     public static UserInfoDto of(Tuple2<User, StatisticsDto> userAndStatistics) {
         return UserInfoDto.builder()

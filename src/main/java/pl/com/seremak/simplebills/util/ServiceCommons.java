@@ -6,17 +6,20 @@ import org.springframework.data.mongodb.core.query.Update;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 public class ServiceCommons {
-    public static final String ID_FIELD = "_id";
+
     public static final String MODIFIED_AT_FIELD = "metadata.modifiedAt";
     public static final String VERSION_FIELD = "metadata.version";
     public static final String CATEGORY_FIELD = "category";
     public static final String DATE_FIELD = "date";
     public static final String USER_FIELD = "user";
     public static final int DEFAULT_PAGE_SIZE = 1000;
-    public static final int DEFAULT_PAGE_NUMBER = 1;
+
 
     public static Update updateMetadata(final Update update) {
         return update
@@ -31,18 +34,25 @@ public class ServiceCommons {
     }
 
     private static Query addBetweenDatesCriteria(final BillQueryParams params, final Query query) {
+        final Optional<Instant> dateFrom = getToInstantUTC(params.getDateFrom());
+        final Optional<Instant> dateTo = getToInstantUTC(params.getDateTo()).map(presentDateTo -> presentDateTo.plus(1, ChronoUnit.DAYS));
         Criteria criteria = Criteria.where(DATE_FIELD);
-        if (params.getDateFrom() != null && params.getDateTo() != null) {
-            criteria.gte(params.getDateFrom()).lte(params.getDateTo());
+        if (dateFrom.isPresent() && dateTo.isPresent()) {
+            criteria.gte(dateFrom.get()).lte(dateTo.get());
             query.addCriteria(criteria);
-        } else if (params.getDateFrom() != null) {
-            criteria.gte(params.getDateFrom());
+        } else if (dateFrom.isPresent()) {
+            criteria.gte(dateFrom.get());
             query.addCriteria(criteria);
-        } else if (params.getDateTo() != null) {
-            criteria.lte(params.getDateTo());
+        } else if (dateTo.isPresent()) {
+            criteria.lte(dateTo.get());
             query.addCriteria(criteria);
         }
         return query;
+    }
+
+    private static Optional<Instant> getToInstantUTC(LocalDate localDate) {
+        return Optional.ofNullable(localDate)
+                        .map(presentLocalDate -> presentLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
     }
 
     public static long calculateSkip(final BillQueryParams params) {
@@ -52,6 +62,4 @@ public class ServiceCommons {
     public static long extractPageSize(BillQueryParams params) {
         return (long) Optional.ofNullable(params.getPageSize()).orElse(DEFAULT_PAGE_SIZE);
     }
-
-
 }

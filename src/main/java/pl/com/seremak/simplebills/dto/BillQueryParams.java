@@ -3,23 +3,24 @@ package pl.com.seremak.simplebills.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillQueryParams {
-    
-    @Nullable
+
     private String category;
-    @Nullable
-    private Instant dateFrom;
-    @Nullable
-    private Instant dateTo;
-    @Nullable
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateFrom;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateTo;
+
     private Integer pageSize;
-    @Nullable
+
     private Integer pageNumber;
 }

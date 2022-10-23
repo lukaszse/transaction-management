@@ -38,23 +38,23 @@ public class BillService {
                 .flatMap(crudRepository::save);
     }
 
-    public Mono<Bill> findBillByBillNumberForUser(final String username, final String billNumber) {
+    public Mono<Bill> findBillByBillNumber(final String username, final String billNumber) {
         return crudRepository.findByUserAndBillNumber(username, billNumber)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(billNumber))))
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, billNumber, username, error.getMessage()));
     }
 
-    public Mono<Tuple2<List<Bill>, Long>> findBillsByCategoryForUser(final String username, final BillQueryParams params) {
+    public Mono<Tuple2<List<Bill>, Long>> findBillsByCategory(final String username, final BillQueryParams params) {
         return billSearchRepository.find(username, params)
                 .collectList()
-                .zipWith(countBillsByCategoryForUser(username, params));
+                .zipWith(countBillsByCategory(username, params));
     }
 
-    public Mono<Long> countBillsByCategoryForUser(final String username, final BillQueryParams params) {
+    public Mono<Long> countBillsByCategory(final String username, final BillQueryParams params) {
         return billSearchRepository.count(username, params);
     }
 
-    public Mono<Bill> deleteBillByBillNumberForUser(final String username, final String billNumber) {
+    public Mono<Bill> deleteBillByBillNumber(final String username, final String billNumber) {
         return crudRepository.deleteByUserAndBillNumber(username, billNumber)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, username, error.getMessage()));
     }

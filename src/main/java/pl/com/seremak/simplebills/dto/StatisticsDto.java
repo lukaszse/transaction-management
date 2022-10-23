@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import reactor.util.function.Tuple2;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -21,14 +21,14 @@ public class StatisticsDto {
     private String category;
     private BigDecimal sum;
     private BigDecimal mean;
-    private Instant periodFrom;
-    private Instant periodTo;
+    private LocalDate periodFrom;
+    private LocalDate periodTo;
 
     public static StatisticsDto of(final Tuple2<BigDecimal, BigDecimal> sumAndmeanTuple,
                                    final String userName,
                                    final String category,
-                                   final Instant periodFrom,
-                                   final Instant periodTo) {
+                                   final LocalDate periodFrom,
+                                   final LocalDate periodTo) {
         return StatisticsDto.builder()
                 .userName(userName)
                 .category(category)
