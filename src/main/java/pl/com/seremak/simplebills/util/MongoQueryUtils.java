@@ -11,7 +11,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-public class ServiceCommons {
+public class MongoQueryUtils {
 
     public static final String MODIFIED_AT_FIELD = "metadata.modifiedAt";
     public static final String VERSION_FIELD = "metadata.version";
@@ -25,6 +25,14 @@ public class ServiceCommons {
         return update
                 .set(MODIFIED_AT_FIELD, Instant.now())
                 .inc(VERSION_FIELD, 1);
+    }
+
+    public static Query prepareFindBillByUserAndCategoryQueryPageable(final String userName, final BillQueryParams params) {
+        Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
+        if (params.getCategory() != null) query.addCriteria(Criteria.where(CATEGORY_FIELD).is(params.getCategory()));
+        query.skip(calculateSkip(params));
+        query.limit((int) extractPageSize(params));
+        return addBetweenDatesCriteria(params, query);
     }
 
     public static Query prepareFindBillByUserAndCategoryQuery(final String userName, final BillQueryParams params) {

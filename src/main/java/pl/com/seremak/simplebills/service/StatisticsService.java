@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import static pl.com.seremak.simplebills.util.ServiceCommons.prepareFindBillByUserAndCategoryQuery;
+import static pl.com.seremak.simplebills.util.MongoQueryUtils.prepareFindBillByUserAndCategoryQuery;
 
 @Slf4j
 @Service

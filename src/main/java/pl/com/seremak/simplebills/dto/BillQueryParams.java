@@ -23,4 +23,6 @@ public class BillQueryParams {
     private Integer pageSize;
 
     private Integer pageNumber;
+    private SortDirection sortDirection;
+    private String searchTerm;
 }
