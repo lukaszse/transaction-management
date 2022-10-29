@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
 @Slf4j
 @Configuration
-public class MongoReactiveRepositoryConfig  {
+public class MongoReactiveRepositoryConfig {
 
     @Value("${spring.data.mongodb.database}")
     private String simpleBillDatabase;
@@ -19,8 +19,8 @@ public class MongoReactiveRepositoryConfig  {
     private String simpleBillsDatabaseUri;
 
 
-
-    public @Bean ReactiveMongoTemplate reactiveMongoTemplate() {
+    @Bean
+    public ReactiveMongoTemplate reactiveMongoTemplate() {
         return new ReactiveMongoTemplate(mongoClient(), simpleBillDatabase);
     }
 
