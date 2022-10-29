@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -72,7 +73,7 @@ public class BillService {
 
     private Bill setCurrentDateIfMissing(final Bill bill) {
         if (bill.getDate() == null) {
-            bill.setDate(Instant.now());
+            bill.setDate(LocalDate.now());
         }
         return bill;
     }

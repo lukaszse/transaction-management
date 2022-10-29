@@ -1,15 +1,12 @@
 package pl.com.seremak.simplebills.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.dto.UserDto;
-import pl.com.seremak.simplebills.exceptions.JwtTokenParsingException;
 
-import java.util.Base64;
 import java.util.Map;
 
 @Service

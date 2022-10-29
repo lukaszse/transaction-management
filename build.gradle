@@ -7,7 +7,7 @@ plugins {
 
 group = 'pl.com.seremak'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+sourceCompatibility = '17'
 
 configurations {
 	compileOnly {
@@ -36,6 +36,7 @@ dependencies {
 	implementation 'org.keycloak:keycloak-spring-security-adapter:19.0.3'
 	implementation 'org.codehaus.groovy:groovy:3.0.10'
 	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -46,9 +47,9 @@ dependencies {
 	testImplementation 'org.testcontainers:junit-jupiter'
 	testImplementation 'org.testcontainers:mongodb'
 	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
-	testImplementation 'org.codehaus.groovy:groovy:3.0.5'
-	testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
-	testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
+	testImplementation 'org.codehaus.groovy:groovy:3.0.7'
+	testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
+	testImplementation 'org.spockframework:spock-spring:2.3-groovy-3.0'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 }

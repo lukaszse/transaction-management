@@ -9,7 +9,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.server.resource.web.server.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -28,8 +27,9 @@ public class SpringSecurity {
             ServerHttpSecurity http) {
         return http
                 .csrf()
-                .csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
-                .and()
+                .disable()
+//                .csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+//                .and()
                 .authorizeExchange()
                 .pathMatchers("/users/admin", "/users/admin/*").hasAuthority("ROLE_ADMIN")
                 .anyExchange().permitAll()

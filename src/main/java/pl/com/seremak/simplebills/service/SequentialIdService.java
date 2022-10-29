@@ -30,7 +30,6 @@ public class SequentialIdService {
                 .map(SequentialId::getSequentialId)
                 .map(String::valueOf)
                 .switchIfEmpty(insertFirstSequentialId(user));
-        // todo implement error handling
     }
 
     public Mono<Void> deleteUser(final String user) {

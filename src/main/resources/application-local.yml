@@ -17,6 +17,3 @@ server:
     include-stacktrace: never
 
 simpleBillsGuiAppUrl: "http://localhost:8089"
-
-#custom
-hello: "Hello %s, Welcome in my application!"

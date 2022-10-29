@@ -4,6 +4,3 @@ spring:
   data:
     mongodb:
       database: simple-bills
-
-#custom
-hello: "Hello in my application"

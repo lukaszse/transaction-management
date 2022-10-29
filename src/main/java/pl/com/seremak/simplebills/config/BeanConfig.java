@@ -18,6 +18,7 @@ public class BeanConfig {
         return JsonMapper.builder()
                 .serializationInclusion(JsonInclude.Include.NON_NULL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .propertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
                 .addModule(new JavaTimeModule())
                 .build();

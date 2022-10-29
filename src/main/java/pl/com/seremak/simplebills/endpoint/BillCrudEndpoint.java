@@ -37,7 +37,7 @@ public class BillCrudEndpoint {
     public static final String BILLS_FETCHED_MESSAGE = "List of bills successfully fetched.";
     public static final String DELETE_BILL_REQUEST_LOG_MESSAGE = "Bill delete request for user={} and billNumber={}";
     public static final String DELETE_UPDATE_REQUEST_LOG_MESSAGE = "Bill update request for user={} and billNumber={}";
-    public static final String BILL_DELETED_MESSAGE = "Bill with user={} and billNumber={} successfully deleted.";
+    public static final String BILL_DELETED_MESSAGE = "Bill for user={} with billNumber={} successfully deleted.";
     public static final String BILL_UPDATED_MESSAGE = "Bill with user={} and billNumber={} successfully update.";
     public static final String BILL_URI_PATTERN = "/bills/%s";
     public static final String ALL_CATEGORIES_LOG_MESSAGE = "All categories";
@@ -52,13 +52,13 @@ public class BillCrudEndpoint {
         log.info(BILL_CREATION_RECEIVED_LOG_MESSAGE, username);
         return service.createBill(username, bill)
                 .doOnSuccess(createdBill -> log.info(BILL_CREATED_MESSAGE, createdBill.getUser(), createdBill.getBillNumber()))
-                .map(createdBill -> bill.getBillNumber())
+                .map(Bill::getBillNumber)
                 .map(billNumber -> createResponse(billNumber, BILL_URI_PATTERN));
     }
 
     @GetMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<Bill>> findBillByBillNumberForUser(final JwtAuthenticationToken principal,
-                                                                  @PathVariable final String billNumber) {
+    public Mono<ResponseEntity<Bill>> findBillByBillNumber(final JwtAuthenticationToken principal,
+                                                           @PathVariable final String billNumber) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(FIND_BILL_REQUEST_LOG_MESSAGE, billNumber, username);
         return service.findBillByBillNumber(username, billNumber)
@@ -77,12 +77,12 @@ public class BillCrudEndpoint {
     }
 
     @DeleteMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
-    public Mono<Object> deleteBill(final JwtAuthenticationToken principal, @PathVariable final String billNumber) {
+    public Mono<ResponseEntity<Void>> deleteBill(final JwtAuthenticationToken principal, @PathVariable final String billNumber) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_BILL_REQUEST_LOG_MESSAGE, username, billNumber);
         return service.deleteBillByBillNumber(username, billNumber)
-                .doOnSuccess(bill -> log.info(BILL_DELETED_MESSAGE, bill.getUser(), bill.getBillNumber()))
-                .map(bill -> ResponseEntity.noContent());
+                .doOnSuccess(__ -> log.info(BILL_DELETED_MESSAGE, username, billNumber))
+                .map(__ -> ResponseEntity.noContent().build());
     }
 
     @PatchMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
