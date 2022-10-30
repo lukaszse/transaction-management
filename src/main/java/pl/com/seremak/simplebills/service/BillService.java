@@ -38,7 +38,7 @@ public class BillService {
                 .flatMap(crudRepository::save);
     }
 
-    public Mono<Bill> findBillByBillNumber(final String username, final String billNumber) {
+    public Mono<Bill> findBillByBillNumber(final String username, final Integer billNumber) {
         return crudRepository.findByUserAndBillNumber(username, billNumber)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(billNumber))))
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, billNumber, username, error.getMessage()));
@@ -54,7 +54,7 @@ public class BillService {
         return billSearchRepository.count(username, params);
     }
 
-    public Mono<Bill> deleteBillByBillNumber(final String username, final String billNumber) {
+    public Mono<Bill> deleteBillByBillNumber(final String username, final Integer billNumber) {
         return crudRepository.deleteByUserAndBillNumber(username, billNumber)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, username, error.getMessage()));
     }
