@@ -64,7 +64,7 @@ public class BillService {
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
 
-    private static Bill setBillNumber(final Bill bill, final String id, final String username) {
+    private static Bill setBillNumber(final Bill bill, final Integer id, final String username) {
         bill.setUser(username);
         bill.setBillNumber(id);
         return bill;

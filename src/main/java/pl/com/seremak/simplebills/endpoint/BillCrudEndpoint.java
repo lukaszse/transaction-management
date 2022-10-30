@@ -54,6 +54,7 @@ public class BillCrudEndpoint {
         return billService.createBill(username, bill)
                 .doOnSuccess(createdBill -> log.info(BILL_CREATED_MESSAGE, createdBill.getUser(), createdBill.getBillNumber()))
                 .map(Bill::getBillNumber)
+                .map(String::valueOf)
                 .map(billNumber -> createResponse(billNumber, BILL_URI_PATTERN));
     }
 

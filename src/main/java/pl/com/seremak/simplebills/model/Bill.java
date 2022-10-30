@@ -24,7 +24,7 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Bill extends VersionedEntity {
 
-    private String billNumber;
+    private Integer billNumber;
     @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
     private String user;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

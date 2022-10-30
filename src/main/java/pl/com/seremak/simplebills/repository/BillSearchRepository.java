@@ -49,7 +49,7 @@ public class BillSearchRepository {
                 Bill.class);
     }
 
-    private static Query prepareFindBillQuery(final String user, final String billNumber) {
+    private static Query prepareFindBillQuery(final String user, final Integer billNumber) {
         return new Query()
                 .addCriteria(Criteria.where(USER_FIELD).is(user))
                 .addCriteria(Criteria.where(BILL_NUMBER_FIELD).is(billNumber));
