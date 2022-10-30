@@ -2,7 +2,6 @@ package pl.com.seremak.simplebills.intTest.endpoint.utils
 
 import pl.com.seremak.simplebills.model.Bill
 import pl.com.seremak.simplebills.model.Metadata
-import pl.com.seremak.simplebills.model.User
 
 import java.time.Instant
 
@@ -59,20 +58,6 @@ class EndpointSpecData {
                 .createdAt(Instant.now())
                 .modifiedAt(Instant.now())
                 .version(1)
-                .build()
-    }
-
-    static def createTestUser(final String userName) {
-        User.builder()
-                .login(userName)
-                .password(TEST_PASSWORD)
-                .build()
-    }
-
-    static def createUser(final String user) {
-        User.builder()
-                .login(user)
-                .password(TEST_PASSWORD)
                 .build()
     }
 

@@ -15,7 +15,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-import static pl.com.seremak.simplebills.util.BillQueryUtils.*;
+import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQuery;
+import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQueryPageable;
+import static pl.com.seremak.simplebills.util.VersionedEntityUtils.updateMetadata;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,8 +31,8 @@ public class BillSearchRepository {
 
     public Flux<Bill> find(final String username, final BillQueryParams params) {
         return mongoTemplate.find(
-                        prepareFindByCategoryQueryPageable(username, params),
-                        Bill.class);
+                prepareFindByCategoryQueryPageable(username, params),
+                Bill.class);
     }
 
     public Mono<Long> count(final String username, final BillQueryParams params) {
@@ -41,10 +43,10 @@ public class BillSearchRepository {
 
     public Mono<Bill> updateBillNumber(final String username, final Bill bill) {
         return mongoTemplate.findAndModify(
-                        prepareFindBillQuery(username, bill.getBillNumber()),
-                        preparePartialUpdateQuery(bill),
-                        new FindAndModifyOptions().returnNew(true),
-                        Bill.class);
+                prepareFindBillQuery(username, bill.getBillNumber()),
+                preparePartialUpdateQuery(bill),
+                new FindAndModifyOptions().returnNew(true),
+                Bill.class);
     }
 
     private static Query prepareFindBillQuery(final String user, final String billNumber) {
@@ -55,8 +57,8 @@ public class BillSearchRepository {
 
     @SuppressWarnings({"unchecked"})
     private Update preparePartialUpdateQuery(final Bill bill) {
-        Update update = new Update();
-        Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
+        final Update update = new Update();
+        final Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
         fieldsMap.entrySet().stream()
                 .filter(field -> field.getValue() != null)
                 .forEach(field -> update.set(field.getKey(), field.getValue()));

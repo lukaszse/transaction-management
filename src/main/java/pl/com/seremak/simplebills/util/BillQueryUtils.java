@@ -3,7 +3,6 @@ package pl.com.seremak.simplebills.util;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 
 import java.time.Instant;
@@ -14,21 +13,13 @@ import java.util.Optional;
 
 public class BillQueryUtils {
 
-    public static final String MODIFIED_AT_FIELD = "metadata.modifiedAt";
-    public static final String VERSION_FIELD = "metadata.version";
     public static final String CATEGORY_FIELD = "category";
     public static final String DATE_FIELD = "date";
     public static final String USER_FIELD = "user";
     public static final int DEFAULT_PAGE_SIZE = 1000;
     public static final String DEFAULT_SORTING_COLUMN = "billNumber";
 
-
-    public static Update updateMetadata(final Update update) {
-        return update
-                .set(MODIFIED_AT_FIELD, Instant.now())
-                .inc(VERSION_FIELD, 1);
-    }
-
+    
     @SuppressWarnings("all")
     public static Query prepareFindByCategoryQueryPageable(final String userName, final BillQueryParams params) {
         Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));

@@ -1,10 +1,7 @@
 package pl.com.seremak.simplebills.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -19,12 +16,13 @@ import java.time.LocalDate;
 
 
 @Document
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Bill {
+public class Bill extends VersionedEntity {
 
     private String billNumber;
     @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
@@ -39,6 +37,4 @@ public class Bill {
     @Positive(message = "Amount cannot be negative")
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal amount;
-    
-    private Metadata metadata;
 }
