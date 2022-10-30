@@ -31,11 +31,9 @@ import static pl.com.seremak.simplebills.service.util.ServiceCommons.*;
 public class BillCrudService {
 
     public static final String OPERATION_ERROR_MESSAGE = "Cannot {} bill with billNumber={} for user={}. Error={}";
-    public static final String OPERATION_ERROR_MESSAGE_CATEGORY = "Cannot {} bills with category={}. Error={}";
     public static final String NOT_FOUND_ERROR_MESSAGE = "Bill with billNumber=%s not found.";
     private static final String USER_FIELD = "user";
     public static final String BILL_NUMBER_FIELD = "billNumber";
-
     private final BillCrudRepository crudRepository;
     private final ReactiveMongoTemplate mongoTemplate;
     private final SequentialIdService sequentialIdRepository;
@@ -44,8 +42,8 @@ public class BillCrudService {
     public Mono<Bill> createBill(final String userName, final Bill bill) {
         return sequentialIdRepository.generateId(userName)
                 .map(id -> setBillNumber(bill, id, userName))
-                .map(this::setCurrentDateIfMissing)
-                .map(this::setMetadata)
+                .map(BillCrudService::setCurrentDateIfMissing)
+                .map(BillCrudService::setMetadata)
                 .flatMap(crudRepository::save);
     }
 
@@ -85,20 +83,20 @@ public class BillCrudService {
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
 
-    private Bill setBillNumber(final Bill bill, final String id, final String userName) {
+    private static Bill setBillNumber(final Bill bill, final String id, final String userName) {
         bill.setUser(userName);
         bill.setBillNumber(id);
         return bill;
     }
 
-    private Bill setCurrentDateIfMissing(final Bill bill) {
+    private static Bill setCurrentDateIfMissing(final Bill bill) {
         if (bill.getDate() == null) {
             bill.setDate(Instant.now());
         }
         return bill;
     }
 
-    private Bill setMetadata(final Bill bill) {
+    private static Bill setMetadata(final Bill bill) {
         bill.setMetadata(
                 Metadata.builder()
                         .createdAt(Instant.now())
@@ -108,7 +106,7 @@ public class BillCrudService {
         return bill;
     }
 
-    private Query prepareFindBillQuery(final String user, final String billNumber) {
+    private static Query prepareFindBillQuery(final String user, final String billNumber) {
         return new Query()
                 .addCriteria(Criteria.where(USER_FIELD).is(user))
                 .addCriteria(Criteria.where(BILL_NUMBER_FIELD).is(billNumber));
@@ -116,8 +114,8 @@ public class BillCrudService {
 
     @SuppressWarnings({"unchecked"})
     private Update preparePartialUpdateQuery(final Bill bill) {
-        Update update = new Update();
-        Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
+        final Update update = new Update();
+        final Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
         fieldsMap.entrySet().stream()
                 .filter(field -> field.getValue() != null)
                 .forEach(field -> update.set(field.getKey(), field.getValue()));
