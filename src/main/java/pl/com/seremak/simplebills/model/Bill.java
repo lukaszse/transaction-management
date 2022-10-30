@@ -1,6 +1,5 @@
 package pl.com.seremak.simplebills.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
 
 
@@ -38,5 +39,6 @@ public class Bill {
     @Positive(message = "Amount cannot be negative")
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal amount;
+    
     private Metadata metadata;
 }

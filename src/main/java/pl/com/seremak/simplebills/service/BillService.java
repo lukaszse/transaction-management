@@ -7,14 +7,13 @@ import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Bill;
-import pl.com.seremak.simplebills.model.Metadata;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.repository.BillSearchRepository;
 import pl.com.seremak.simplebills.util.OperationType;
+import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -34,8 +33,8 @@ public class BillService {
     public Mono<Bill> createBill(final String username, final Bill bill) {
         return sequentialIdRepository.generateId(username)
                 .map(id -> setBillNumber(bill, id, username))
-                .map(this::setCurrentDateIfMissing)
-                .map(this::setMetadata)
+                .map(BillService::setCurrentDateIfMissing)
+                .map(VersionedEntityUtils::setMetadata)
                 .flatMap(crudRepository::save);
     }
 
@@ -65,26 +64,16 @@ public class BillService {
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
 
-    private Bill setBillNumber(final Bill bill, final String id, final String username) {
+    private static Bill setBillNumber(final Bill bill, final String id, final String username) {
         bill.setUser(username);
         bill.setBillNumber(id);
         return bill;
     }
 
-    private Bill setCurrentDateIfMissing(final Bill bill) {
+    private static Bill setCurrentDateIfMissing(final Bill bill) {
         if (bill.getDate() == null) {
             bill.setDate(LocalDate.now());
         }
-        return bill;
-    }
-
-    private Bill setMetadata(final Bill bill) {
-        bill.setMetadata(
-                Metadata.builder()
-                        .createdAt(Instant.now())
-                        .modifiedAt(Instant.now())
-                        .version(1L)
-                        .build());
         return bill;
     }
 }
