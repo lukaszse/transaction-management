@@ -11,8 +11,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8085/realms/baeldung
-          jwk-set-uri: http://localhost:8085/realms/baeldung/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8085/realms/simple-bills
+          jwk-set-uri: http://localhost:8085/realms/simple-bills/protocol/openid-connect/certs
 
 server:
   error:

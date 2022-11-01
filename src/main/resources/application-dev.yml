@@ -9,8 +9,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://37.233.102.95:8080/realms/baeldung
-          jwk-set-uri: https://37.233.102.95:8080/realms/baeldung/protocol/openid-connect/certs
+          issuer-uri: https://37.233.102.95:8080/realms/simple-bills
+          jwk-set-uri: https://37.233.102.95:8080/realms/simple-bills/protocol/openid-connect/certs
 
 server:
   error:
