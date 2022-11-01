@@ -2,21 +2,19 @@ package pl.com.seremak.simplebills.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import pl.com.seremak.simplebills.messageQueue.MessageQueuePublisher;
 import pl.com.seremak.simplebills.model.UserActivity;
 import pl.com.seremak.simplebills.repository.UserActivityRepository;
 import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
-
-import static pl.com.seremak.simplebills.config.RabbitMQConfig.USER_CREATION_QUEUE;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserActivityService {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final MessageQueuePublisher messageQueuePublisher;
 
     public static final String MESSAGE_TO_CATEGORY_SERVICE_IS_BEING_SENT_MSG = """
             The user is logging in for the first time. A message to category service to create standard categories set is being sent""";
@@ -40,7 +38,7 @@ public class UserActivityService {
 
     private void sendMessageToCategoryService(final boolean userNotExists, final String username) {
         if (userNotExists) {
-            rabbitTemplate.convertAndSend(USER_CREATION_QUEUE, username);
+            messageQueuePublisher.sendUserCreationMessage(username);
         }
     }
 
