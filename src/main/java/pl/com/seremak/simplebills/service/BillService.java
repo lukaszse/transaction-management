@@ -26,7 +26,7 @@ public class BillService {
     private static final String NOT_FOUND_ERROR_MESSAGE = "Bill with billNumber=%s not found.";
 
 
-    private final BillCrudRepository crudRepository;
+    private final BillCrudRepository billCrudRepository;
     private final SequentialIdService sequentialIdRepository;
     private final BillSearchRepository billSearchRepository;
 
@@ -35,11 +35,11 @@ public class BillService {
                 .map(id -> setBillNumber(bill, id, username))
                 .map(BillService::setCurrentDateIfMissing)
                 .map(VersionedEntityUtils::setMetadata)
-                .flatMap(crudRepository::save);
+                .flatMap(billCrudRepository::save);
     }
 
     public Mono<Bill> findBillByBillNumber(final String username, final Integer billNumber) {
-        return crudRepository.findByUserAndBillNumber(username, billNumber)
+        return billCrudRepository.findByUserAndBillNumber(username, billNumber)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(billNumber))))
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.READ, billNumber, username, error.getMessage()));
     }
@@ -55,13 +55,26 @@ public class BillService {
     }
 
     public Mono<Bill> deleteBillByBillNumber(final String username, final Integer billNumber) {
-        return crudRepository.deleteByUserAndBillNumber(username, billNumber)
+        return billCrudRepository.deleteByUserAndBillNumber(username, billNumber)
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, username, error.getMessage()));
     }
 
-    public Mono<Bill> updateBillNumber(final String username, final Bill bill) {
-        return billSearchRepository.updateBillNumber(username, bill)
+    public Mono<Bill> updateBill(final String username, final Bill bill) {
+        return billSearchRepository.updateBill(username, bill)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
+    }
+
+    public void changeBillCategory(final String username,
+                                   final String oldCategoryName,
+                                   final String newCategoryName) {
+        billCrudRepository.findByUserAndCategory(username, oldCategoryName)
+                .map(bill -> {
+                    bill.setCategory(newCategoryName);
+                    return bill;
+                })
+                .flatMap(bilWithNewCategory -> updateBill(username, bilWithNewCategory))
+                .doOnNext(updatedBill -> log.info("A bill with billNumber={} category changed from {} to {}", updatedBill.getBillNumber(), oldCategoryName, updatedBill.getCategory()))
+                .subscribe();
     }
 
     private static Bill setBillNumber(final Bill bill, final Integer id, final String username) {

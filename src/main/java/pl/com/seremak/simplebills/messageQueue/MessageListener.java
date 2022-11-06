@@ -20,6 +20,7 @@ public class MessageListener {
     @RabbitListener(queues = USER_CREATION_QUEUE)
     public void listenCategoryDeletionQueue(final CategoryDeletionMessage categoryDeletionMessage) {
         log.info("Category deletion message received: {}", categoryDeletionMessage);
-//        billService.createStandardCategoriesForUserIfNotExists(username);
+        billService.changeBillCategory(categoryDeletionMessage.getUsername(), categoryDeletionMessage.getDeletedCategory(),
+                categoryDeletionMessage.getReplacementCategory());
     }
 }

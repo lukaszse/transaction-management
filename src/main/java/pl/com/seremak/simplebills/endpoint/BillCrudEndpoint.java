@@ -93,7 +93,7 @@ public class BillCrudEndpoint {
                                                  @PathVariable final Integer billNumber) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_UPDATE_REQUEST_LOG_MESSAGE, username, billNumber);
-        return billService.updateBillNumber(username, bill)
+        return billService.updateBill(username, bill)
                 .doOnSuccess(theBill -> log.info(BILL_UPDATED_MESSAGE, theBill.getUser(), theBill.getBillNumber()))
                 .map(ResponseEntity::ok);
     }

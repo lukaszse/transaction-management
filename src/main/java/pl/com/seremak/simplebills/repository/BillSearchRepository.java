@@ -41,7 +41,7 @@ public class BillSearchRepository {
                 Bill.class);
     }
 
-    public Mono<Bill> updateBillNumber(final String username, final Bill bill) {
+    public Mono<Bill> updateBill(final String username, final Bill bill) {
         return mongoTemplate.findAndModify(
                 prepareFindBillQuery(username, bill.getBillNumber()),
                 preparePartialUpdateQuery(bill),
