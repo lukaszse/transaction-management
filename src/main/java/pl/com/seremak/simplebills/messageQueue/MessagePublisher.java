@@ -10,7 +10,7 @@ import static pl.com.seremak.simplebills.config.RabbitMQConfig.USER_CREATION_QUE
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class MessageQueuePublisher {
+public class MessagePublisher {
 
     private final RabbitTemplate rabbitTemplate;
 
