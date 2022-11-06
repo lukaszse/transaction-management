@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import pl.com.seremak.simplebills.dto.BillDto;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.service.BillService;
@@ -48,10 +49,10 @@ public class BillCrudEndpoint {
 
     @PostMapping(produces = TEXT_PLAIN_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<String>> createBill(@AuthenticationPrincipal final JwtAuthenticationToken principal,
-                                                   @Valid @RequestBody final Bill bill) {
+                                                   @Valid @RequestBody final BillDto billDto) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(BILL_CREATION_RECEIVED_LOG_MESSAGE, username);
-        return billService.createBill(username, bill)
+        return billService.createBill(username, billDto)
                 .doOnSuccess(createdBill -> log.info(BILL_CREATED_MESSAGE, createdBill.getUser(), createdBill.getBillNumber()))
                 .map(Bill::getBillNumber)
                 .map(String::valueOf)
@@ -89,11 +90,11 @@ public class BillCrudEndpoint {
 
     @PatchMapping(value = "/{billNumber}", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Bill>> updateBill(final JwtAuthenticationToken principal,
-                                                 @RequestBody final Bill bill,
+                                                 @RequestBody final BillDto billDto,
                                                  @PathVariable final Integer billNumber) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_UPDATE_REQUEST_LOG_MESSAGE, username, billNumber);
-        return billService.updateBill(username, bill)
+        return billService.updateBill(username, billDto)
                 .doOnSuccess(theBill -> log.info(BILL_UPDATED_MESSAGE, theBill.getUser(), theBill.getBillNumber()))
                 .map(ResponseEntity::ok);
     }

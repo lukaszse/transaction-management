@@ -5,17 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.com.seremak.simplebills.dto.BillDto;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.repository.BillSearchRepository;
+import pl.com.seremak.simplebills.util.BillConverter;
 import pl.com.seremak.simplebills.util.OperationType;
 import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -31,7 +33,8 @@ public class BillService {
     private final ObjectMapper objectMapper;
 
 
-    public Mono<Bill> createBill(final String username, final Bill bill) {
+    public Mono<Bill> createBill(final String username, final BillDto billDto) {
+        final Bill bill = BillConverter.toBill(billDto);
         return sequentialIdRepository.generateId(username)
                 .map(id -> setBillNumber(bill, id, username))
                 .map(BillService::setCurrentDateIfMissing)
@@ -60,7 +63,8 @@ public class BillService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, username, error.getMessage()));
     }
 
-    public Mono<Bill> updateBill(final String username, final Bill bill) {
+    public Mono<Bill> updateBill(final String username, final BillDto billDto) {
+        final Bill bill = BillConverter.toBill(billDto);
         bill.setMetadata(null);
         return billSearchRepository.updateBill(username, bill)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
@@ -84,13 +88,14 @@ public class BillService {
 
     private static Bill setCurrentDateIfMissing(final Bill bill) {
         if (bill.getDate() == null) {
-            bill.setDate(LocalDate.now());
+            bill.setDate(Instant.now());
         }
         return bill;
     }
 
-    private static Bill setCategory(final Bill bill, final String newCategoryName) {
-        bill.setCategory(newCategoryName);
-        return bill;
+    private static BillDto setCategory(final Bill bill, final String newCategoryName) {
+        final BillDto billDto = BillConverter.toBillDto(bill);
+        billDto.setCategory(newCategoryName);
+        return billDto;
     }
 }

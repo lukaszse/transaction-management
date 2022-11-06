@@ -6,10 +6,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+
+import static pl.com.seremak.simplebills.util.DateUtils.toInstantUTC;
 
 public class BillQueryUtils {
 
@@ -19,7 +19,7 @@ public class BillQueryUtils {
     public static final int DEFAULT_PAGE_SIZE = 1000;
     public static final String DEFAULT_SORTING_COLUMN = "billNumber";
 
-    
+
     @SuppressWarnings("all")
     public static Query prepareFindByCategoryQueryPageable(final String userName, final BillQueryParams params) {
         Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
@@ -31,15 +31,15 @@ public class BillQueryUtils {
     }
 
     public static Query prepareFindByCategoryQuery(final String userName, final BillQueryParams params) {
-        Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
+        final Query query = new Query().addCriteria(Criteria.where(USER_FIELD).is(userName));
         if (params.getCategory() != null) query.addCriteria(Criteria.where(CATEGORY_FIELD).is(params.getCategory()));
         return addBetweenDatesCriteria(params, query);
     }
 
     private static Query addBetweenDatesCriteria(final BillQueryParams params, final Query query) {
-        final Optional<Instant> dateFrom = getToInstantUTC(params.getDateFrom());
-        final Optional<Instant> dateTo = getToInstantUTC(params.getDateTo()).map(presentDateTo -> presentDateTo.plus(1, ChronoUnit.DAYS));
-        Criteria criteria = Criteria.where(DATE_FIELD);
+        final Optional<Instant> dateFrom = toInstantUTC(params.getDateFrom());
+        final Optional<Instant> dateTo = toInstantUTC(params.getDateTo()).map(presentDateTo -> presentDateTo.plus(1, ChronoUnit.DAYS));
+        final Criteria criteria = Criteria.where(DATE_FIELD);
         if (dateFrom.isPresent() && dateTo.isPresent()) {
             criteria.gte(dateFrom.get()).lte(dateTo.get());
             query.addCriteria(criteria);
@@ -53,16 +53,11 @@ public class BillQueryUtils {
         return query;
     }
 
-    private static Optional<Instant> getToInstantUTC(LocalDate localDate) {
-        return Optional.ofNullable(localDate)
-                .map(presentLocalDate -> presentLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant());
-    }
-
     public static long calculateSkip(final BillQueryParams params) {
         return (long) Optional.ofNullable(params.getPageSize()).orElse(0) * (Optional.ofNullable(params.getPageNumber()).orElse(0) - 1);
     }
 
-    public static long extractPageSize(BillQueryParams params) {
+    public static long extractPageSize(final BillQueryParams params) {
         return (long) Optional.ofNullable(params.getPageSize()).orElse(DEFAULT_PAGE_SIZE);
     }
 
