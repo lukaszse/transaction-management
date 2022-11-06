@@ -1,6 +1,7 @@
 package pl.com.seremak.simplebills.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,11 @@ public class BillService {
 
     public static final String OPERATION_ERROR_MESSAGE = "Cannot {} bill with billNumber={} for user={}. Error={}";
     private static final String NOT_FOUND_ERROR_MESSAGE = "Bill with billNumber=%s not found.";
-
-
     private final BillCrudRepository billCrudRepository;
     private final SequentialIdService sequentialIdRepository;
     private final BillSearchRepository billSearchRepository;
+    private final ObjectMapper objectMapper;
+
 
     public Mono<Bill> createBill(final String username, final Bill bill) {
         return sequentialIdRepository.generateId(username)
@@ -60,6 +61,7 @@ public class BillService {
     }
 
     public Mono<Bill> updateBill(final String username, final Bill bill) {
+        bill.setMetadata(null);
         return billSearchRepository.updateBill(username, bill)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
@@ -68,11 +70,8 @@ public class BillService {
                                    final String oldCategoryName,
                                    final String newCategoryName) {
         billCrudRepository.findByUserAndCategory(username, oldCategoryName)
-                .map(bill -> {
-                    bill.setCategory(newCategoryName);
-                    return bill;
-                })
-                .flatMap(bilWithNewCategory -> updateBill(username, bilWithNewCategory))
+                .map(bill -> setCategory(bill, newCategoryName))
+                .flatMap(billWithNewCategory -> updateBill(username, billWithNewCategory))
                 .doOnNext(updatedBill -> log.info("A bill with billNumber={} category changed from {} to {}", updatedBill.getBillNumber(), oldCategoryName, updatedBill.getCategory()))
                 .subscribe();
     }
@@ -87,6 +86,11 @@ public class BillService {
         if (bill.getDate() == null) {
             bill.setDate(LocalDate.now());
         }
+        return bill;
+    }
+
+    private static Bill setCategory(final Bill bill, final String newCategoryName) {
+        bill.setCategory(newCategoryName);
         return bill;
     }
 }
