@@ -1,11 +1,11 @@
 package pl.com.seremak.simplebills.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -27,7 +27,9 @@ public class Bill extends VersionedEntity {
     private Integer billNumber;
     @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
     private String user;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    @Field(targetType = FieldType.DATE_TIME)
     private Instant date;
     @NotBlank(message = "Description cannot be blank")
     private String description;

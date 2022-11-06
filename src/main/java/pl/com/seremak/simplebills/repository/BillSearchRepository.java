@@ -13,7 +13,9 @@ import pl.com.seremak.simplebills.model.Bill;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 
 import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQuery;
 import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQueryPageable;
@@ -57,11 +59,16 @@ public class BillSearchRepository {
 
     @SuppressWarnings({"unchecked"})
     private Update preparePartialUpdateQuery(final Bill bill) {
+        final Instant date = bill.getDate();
+        bill.setDate(null);
         final Update update = new Update();
         final Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
         fieldsMap.entrySet().stream()
                 .filter(field -> field.getValue() != null)
                 .forEach(field -> update.set(field.getKey(), field.getValue()));
+        if (Objects.nonNull(bill.getDate())) {
+            update.set("date", date);
+        }
         return updateMetadata(update);
     }
 }

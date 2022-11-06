@@ -94,6 +94,7 @@ public class BillService {
     }
 
     private static BillDto setCategory(final Bill bill, final String newCategoryName) {
+
         final BillDto billDto = BillConverter.toBillDto(bill);
         billDto.setCategory(newCategoryName);
         return billDto;
