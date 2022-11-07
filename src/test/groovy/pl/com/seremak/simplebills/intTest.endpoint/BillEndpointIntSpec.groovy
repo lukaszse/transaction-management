@@ -10,7 +10,7 @@ import java.time.Instant
 
 import static pl.com.seremak.simplebills.intTest.endpoint.utils.EndpointSpecData.*
 
-class BillCrudEndpointIntSpec extends EndpointIntSpec {
+class BillEndpointIntSpec extends EndpointIntSpec {
 
     def 'should create bill for user and then fetch created bill'() {
 

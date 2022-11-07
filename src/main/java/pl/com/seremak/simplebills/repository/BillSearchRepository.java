@@ -13,12 +13,12 @@ import pl.com.seremak.simplebills.model.Bill;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Arrays;
 
+import static java.util.Objects.nonNull;
 import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQuery;
 import static pl.com.seremak.simplebills.util.BillQueryUtils.prepareFindByCategoryQueryPageable;
+import static pl.com.seremak.simplebills.util.ReflectionsUtils.getFieldValue;
 import static pl.com.seremak.simplebills.util.VersionedEntityUtils.updateMetadata;
 
 @Repository
@@ -57,18 +57,11 @@ public class BillSearchRepository {
                 .addCriteria(Criteria.where(BILL_NUMBER_FIELD).is(billNumber));
     }
 
-    @SuppressWarnings({"unchecked"})
-    private Update preparePartialUpdateQuery(final Bill bill) {
-        final Instant date = bill.getDate();
-        bill.setDate(null);
+    private static Update preparePartialUpdateQuery(final Bill bill) {
         final Update update = new Update();
-        final Map<String, Object> fieldsMap = objectMapper.convertValue(bill, Map.class);
-        fieldsMap.entrySet().stream()
-                .filter(field -> field.getValue() != null)
-                .forEach(field -> update.set(field.getKey(), field.getValue()));
-        if (Objects.nonNull(bill.getDate())) {
-            update.set("date", date);
-        }
+        Arrays.stream(Bill.class.getDeclaredFields())
+                .filter(field -> nonNull(getFieldValue(field, bill)))
+                .forEach(field -> update.set(field.getName(), getFieldValue(field, bill)));
         return updateMetadata(update);
     }
 }

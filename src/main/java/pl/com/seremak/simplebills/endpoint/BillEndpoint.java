@@ -28,7 +28,7 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 @RestController
 @RequestMapping("/bills")
 @RequiredArgsConstructor
-public class BillCrudEndpoint {
+public class BillEndpoint {
 
     public static final String BILL_CREATION_RECEIVED_LOG_MESSAGE = "Received bill creation request from user={}";
     public static final String X_TOTAL_COUNT_HEADER = "x-total-count";

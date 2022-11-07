@@ -24,7 +24,7 @@ public class SpringSecurity {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(
-            ServerHttpSecurity http) {
+            final ServerHttpSecurity http) {
         return http
                 .csrf()
                 .disable()
@@ -46,6 +46,7 @@ public class SpringSecurity {
         corsConfig.applyPermitDefaultValues();
         corsConfig.addAllowedMethod(HttpMethod.PUT);
         corsConfig.addAllowedMethod(HttpMethod.DELETE);
+        corsConfig.addAllowedMethod(HttpMethod.PATCH);
         corsConfig.setAllowedOrigins(List.of(simpleBillsGuiApp));
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
@@ -53,7 +54,7 @@ public class SpringSecurity {
     }
 
     private ServerAuthenticationConverter bearerTokenConverter() {
-        ServerBearerTokenAuthenticationConverter authenticationConverter = new ServerBearerTokenAuthenticationConverter();
+        final ServerBearerTokenAuthenticationConverter authenticationConverter = new ServerBearerTokenAuthenticationConverter();
         authenticationConverter.setAllowUriQueryParameter(true);
         return authenticationConverter;
     }
