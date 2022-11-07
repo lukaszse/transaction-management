@@ -92,14 +92,14 @@ public class BillService {
 
     private void prepareAndSendBillActionMessage(final Bill bill, final ActionType actionType) {
         final BillActionMessage billActionMessage =
-                new BillActionMessage(bill.getCategory(), actionType, bill.getAmount());
+                new BillActionMessage(bill.getUser(), bill.getCategory(), actionType, bill.getAmount());
         messagePublisher.sendBillActionMessage(billActionMessage);
     }
 
     private void prepareAndSendBillActionMessage(final Bill oldBill, final Bill newBill, final ActionType actionType) {
         final BigDecimal amountDifference = newBill.getAmount().subtract(oldBill.getAmount());
         final BillActionMessage billActionMessage =
-                new BillActionMessage(newBill.getCategory(), actionType, amountDifference);
+                new BillActionMessage(newBill.getUser(), newBill.getCategory(), actionType, amountDifference);
         messagePublisher.sendBillActionMessage(billActionMessage);
     }
 

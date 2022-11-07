@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class BillActionMessage implements Serializable {
 
+    private String username;
     private String categoryName;
     private ActionType type;
     private BigDecimal amount;
