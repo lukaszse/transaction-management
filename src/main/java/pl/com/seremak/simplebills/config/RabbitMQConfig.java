@@ -20,6 +20,8 @@ public class RabbitMQConfig {
 
     public static final String USER_CREATION_QUEUE = "userCreation";
     public static final String CATEGORY_DELETION_QUEUE = "categoryDeletionQueue";
+    public static final String BILL_ACTION_MESSAGE = "billAction";
+
     private final CachingConnectionFactory cachingConnectionFactory;
 
 
@@ -52,5 +54,10 @@ public class RabbitMQConfig {
     @Bean
     public Queue categoryDeletionQueue() {
         return new Queue(CATEGORY_DELETION_QUEUE, false);
+    }
+
+    @Bean
+    public Queue billActionQueue() {
+        return new Queue(BILL_ACTION_MESSAGE, false);
     }
 }

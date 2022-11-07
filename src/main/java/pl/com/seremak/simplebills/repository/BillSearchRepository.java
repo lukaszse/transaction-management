@@ -1,6 +1,5 @@
 package pl.com.seremak.simplebills.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -27,9 +26,8 @@ public class BillSearchRepository {
 
     private static final String USER_FIELD = "user";
     private static final String BILL_NUMBER_FIELD = "billNumber";
-
     private final ReactiveMongoTemplate mongoTemplate;
-    private final ObjectMapper objectMapper;
+
 
     public Flux<Bill> find(final String username, final BillQueryParams params) {
         return mongoTemplate.find(

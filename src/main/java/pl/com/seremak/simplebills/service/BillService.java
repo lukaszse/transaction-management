@@ -1,13 +1,14 @@
 package pl.com.seremak.simplebills.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.dto.BillDto;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
+import pl.com.seremak.simplebills.messageQueue.MessagePublisher;
+import pl.com.seremak.simplebills.messageQueue.queueDto.BillActionMessage;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.repository.BillSearchRepository;
@@ -17,8 +18,11 @@ import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+
+import static pl.com.seremak.simplebills.messageQueue.queueDto.BillActionMessage.ActionType;
 
 @Slf4j
 @Service
@@ -30,7 +34,7 @@ public class BillService {
     private final BillCrudRepository billCrudRepository;
     private final SequentialIdService sequentialIdRepository;
     private final BillSearchRepository billSearchRepository;
-    private final ObjectMapper objectMapper;
+    private final MessagePublisher messagePublisher;
 
 
     public Mono<Bill> createBill(final String username, final BillDto billDto) {
@@ -39,7 +43,8 @@ public class BillService {
                 .map(id -> setBillNumber(bill, id, username))
                 .map(BillService::setCurrentDateIfMissing)
                 .map(VersionedEntityUtils::setMetadata)
-                .flatMap(billCrudRepository::save);
+                .flatMap(billCrudRepository::save)
+                .doOnSuccess(createdBill -> prepareAndSendBillActionMessage(createdBill, ActionType.CREATION));
     }
 
     public Mono<Bill> findBillByBillNumber(final String username, final Integer billNumber) {
@@ -60,13 +65,18 @@ public class BillService {
 
     public Mono<Bill> deleteBillByBillNumber(final String username, final Integer billNumber) {
         return billCrudRepository.deleteByUserAndBillNumber(username, billNumber)
+                .doOnSuccess(deletedBill -> prepareAndSendBillActionMessage(deletedBill, ActionType.DELETION))
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, billNumber, username, error.getMessage()));
     }
 
     public Mono<Bill> updateBill(final String username, final BillDto billDto) {
         final Bill bill = BillConverter.toBill(billDto);
         bill.setMetadata(null);
-        return billSearchRepository.updateBill(username, bill)
+        return findBillByBillNumber(username, bill.getBillNumber())
+                .zipWith(billSearchRepository.updateBill(username, bill))
+                .doOnSuccess(billTuple ->
+                        prepareAndSendBillActionMessage(billTuple.getT1(), billTuple.getT2(), ActionType.UPDATE))
+                .map(Tuple2::getT2)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
 
@@ -78,6 +88,19 @@ public class BillService {
                 .flatMap(billWithNewCategory -> updateBill(username, billWithNewCategory))
                 .doOnNext(updatedBill -> log.info("A bill with billNumber={} category changed from {} to {}", updatedBill.getBillNumber(), oldCategoryName, updatedBill.getCategory()))
                 .subscribe();
+    }
+
+    private void prepareAndSendBillActionMessage(final Bill bill, final ActionType actionType) {
+        final BillActionMessage billActionMessage =
+                new BillActionMessage(bill.getCategory(), actionType, bill.getAmount());
+        messagePublisher.sendBillActionMessage(billActionMessage);
+    }
+
+    private void prepareAndSendBillActionMessage(final Bill oldBill, final Bill newBill, final ActionType actionType) {
+        final BigDecimal amountDifference = newBill.getAmount().subtract(oldBill.getAmount());
+        final BillActionMessage billActionMessage =
+                new BillActionMessage(newBill.getCategory(), actionType, amountDifference);
+        messagePublisher.sendBillActionMessage(billActionMessage);
     }
 
     private static Bill setBillNumber(final Bill bill, final Integer id, final String username) {

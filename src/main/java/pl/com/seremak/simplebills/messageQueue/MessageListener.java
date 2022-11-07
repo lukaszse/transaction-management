@@ -16,7 +16,6 @@ import static pl.com.seremak.simplebills.config.RabbitMQConfig.CATEGORY_DELETION
 @RequiredArgsConstructor
 public class MessageListener {
 
-
     private final BillService billService;
 
 
