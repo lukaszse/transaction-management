@@ -83,7 +83,7 @@ public class BillService {
                                    final String oldCategoryName,
                                    final String newCategoryName) {
         billCrudRepository.findByUserAndCategory(username, oldCategoryName)
-                .map(bill -> setCategory(bill, newCategoryName))
+                .map(bill -> updateCategory(bill, newCategoryName))
                 .flatMap(billWithNewCategory -> updateBill(username, billWithNewCategory))
                 .doOnNext(updatedBill -> log.info("A bill with billNumber={} category changed from {} to {}", updatedBill.getBillNumber(), oldCategoryName, updatedBill.getCategory()))
                 .subscribe();
@@ -91,13 +91,13 @@ public class BillService {
 
     private void prepareAndSendBillActionMessage(final Bill bill, final ActionType actionType) {
         final TransactionDto billActionMessage = toTransactionDto(bill, actionType);
-        messagePublisher.sendBillActionMessage(billActionMessage);
+        messagePublisher.sendTransactionMessage(billActionMessage);
     }
 
     private void prepareAndSendBillUpdateActionMessage(final Bill oldBill, final Bill newBill) {
         final BigDecimal amountDifference = newBill.getAmount().subtract(oldBill.getAmount());
-        final TransactionDto billActionMessage = toTransactionDto(newBill, ActionType.UPDATE, amountDifference);
-        messagePublisher.sendBillActionMessage(billActionMessage);
+        final TransactionDto transactionDto = toTransactionDto(newBill, ActionType.UPDATE, amountDifference);
+        messagePublisher.sendTransactionMessage(transactionDto);
     }
 
     private static Bill setBillNumber(final Bill bill, final Integer id, final String username) {
@@ -113,7 +113,7 @@ public class BillService {
         return bill;
     }
 
-    private static BillDto setCategory(final Bill bill, final String newCategoryName) {
+    private static BillDto updateCategory(final Bill bill, final String newCategoryName) {
 
         final BillDto billDto = toBillDto(bill);
         billDto.setCategory(newCategoryName);

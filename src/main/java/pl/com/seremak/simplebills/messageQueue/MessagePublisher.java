@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 import pl.com.seremak.simplebills.messageQueue.queueDto.TransactionDto;
 
-import static pl.com.seremak.simplebills.config.RabbitMQConfig.BILL_ACTION_MESSAGE;
+import static pl.com.seremak.simplebills.config.RabbitMQConfig.TRANSACTION_QUEUE;
 import static pl.com.seremak.simplebills.config.RabbitMQConfig.USER_CREATION_QUEUE;
 
 @Slf4j
@@ -21,8 +21,8 @@ public class MessagePublisher {
         log.info("Message sent: queue={}, message={}", USER_CREATION_QUEUE, username);
     }
 
-    public void sendBillActionMessage(final TransactionDto billActionMessage) {
-        rabbitTemplate.convertAndSend(BILL_ACTION_MESSAGE, billActionMessage);
-        log.info("Message sent: queue={}, message={}", BILL_ACTION_MESSAGE, billActionMessage);
+    public void sendTransactionMessage(final TransactionDto transactionDto) {
+        rabbitTemplate.convertAndSend(TRANSACTION_QUEUE, transactionDto);
+        log.info("Message sent: queue={}, message={}", TRANSACTION_QUEUE, transactionDto);
     }
 }
