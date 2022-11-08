@@ -7,8 +7,6 @@ import pl.com.seremak.simplebills.util.DateUtils;
 
 import java.math.BigDecimal;
 
-import static pl.com.seremak.simplebills.messageQueue.queueDto.TransactionDto.ActionType;
-import static pl.com.seremak.simplebills.messageQueue.queueDto.TransactionDto.builder;
 import static pl.com.seremak.simplebills.util.DateUtils.toInstantUTC;
 
 public class BillConverter {
@@ -41,12 +39,15 @@ public class BillConverter {
         return billDtoBuilder.build();
     }
 
-    public static TransactionDto toTransactionDto(final Bill bill, final ActionType actionType) {
+    public static TransactionDto toTransactionDto(final Bill bill,
+                                                  final TransactionDto.ActionType actionType) {
         return toTransactionDto(bill, actionType, bill.getAmount());
     }
 
-    public static TransactionDto toTransactionDto(final Bill bill, final ActionType actionType, final BigDecimal amount) {
-        return builder()
+    public static TransactionDto toTransactionDto(final Bill bill,
+                                                  final TransactionDto.ActionType actionType,
+                                                  final BigDecimal amount) {
+        return TransactionDto.builder()
                 .username(bill.getUser())
                 .categoryName(bill.getCategory())
                 .type(actionType)

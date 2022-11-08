@@ -1,5 +1,6 @@
 package pl.com.seremak.simplebills.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
@@ -23,6 +24,7 @@ public class RabbitMQConfig {
     public static final String TRANSACTION_QUEUE = "transaction";
 
     private final CachingConnectionFactory cachingConnectionFactory;
+    private final ObjectMapper objectMapper;
 
 
     @Bean
@@ -34,7 +36,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        return new Jackson2JsonMessageConverter(objectMapper);
     }
 
     /**

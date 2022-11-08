@@ -27,4 +27,9 @@ public class DateUtils {
                 .flatMap(DateUtils::toLocalDate)
                 .map(localDate -> YearMonth.of(localDate.getYear(), localDate.getMonth()));
     }
+
+    public static Optional<String> toYearMonthString(final Instant instant) {
+        return toYearMonth(instant)
+                .map(YearMonth::toString);
+    }
 }

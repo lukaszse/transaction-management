@@ -18,9 +18,7 @@ import static pl.com.seremak.simplebills.util.MongoQueryHelper.preparePartialUpd
 @Repository
 @RequiredArgsConstructor
 public class BillSearchRepository {
-
-    private static final String USER_FIELD = "user";
-    private static final String BILL_NUMBER_FIELD = "billNumber";
+    
     private final ReactiveMongoTemplate mongoTemplate;
 
 
@@ -46,7 +44,7 @@ public class BillSearchRepository {
 
     private static Query prepareFindBillQuery(final String user, final Integer billNumber) {
         return new Query()
-                .addCriteria(Criteria.where(USER_FIELD).is(user))
-                .addCriteria(Criteria.where(BILL_NUMBER_FIELD).is(billNumber));
+                .addCriteria(Criteria.where("user").is(user))
+                .addCriteria(Criteria.where("billNumber").is(billNumber));
     }
 }
