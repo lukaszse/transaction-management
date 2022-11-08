@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import pl.com.seremak.simplebills.model.Bill;
-import pl.com.seremak.simplebills.repository.BillCrudRepository;
+import pl.com.seremak.simplebills.model.Transaction;
+import pl.com.seremak.simplebills.repository.TransactionCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -23,16 +23,16 @@ import static pl.com.seremak.simplebills.intTest.repository.RepositoryTestData.*
 @SpringBootTest
 @ActiveProfiles("test")
 @Slf4j
-public class BillCrudRepositoryIntegrationTest {
+public class TransactionCrudRepositoryIntegrationTest {
 
     @Autowired
-    public BillCrudRepository repository;
+    public TransactionCrudRepository repository;
 
     @BeforeEach
     public void setup() {
         try {
             repository.deleteAll().block();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.info("Some errors while Bills deleting occurred");
         }
     }
@@ -48,10 +48,10 @@ public class BillCrudRepositoryIntegrationTest {
     public void fetchDocument() {
 
         // given
-        repository.save(prepareBill("2")).block();
+        repository.save(prepareBill(2)).block();
 
         // when
-        Mono<Bill> monoBill = repository.findByUserAndBillNumber(TEST_USER, "2");
+        final Mono<Transaction> monoBill = repository.findByUserAndTransactionNumber(TEST_USER, 2);
 
         // then
         StepVerifier
@@ -70,11 +70,11 @@ public class BillCrudRepositoryIntegrationTest {
 
         // given
         IntStream.range(11, 21)
-                .forEach(i -> repository.save(prepareBill(String.valueOf(i))).block());
+                .forEach(i -> repository.save(prepareBill(i)).block());
 
         // when
-        Flux<Bill> fluxBills = repository.findAll();
-        List<Bill> bills = repository.findAll().collectList().block();
+        final Flux<Transaction> fluxBills = repository.findAll();
+        final List<Transaction> transactions = repository.findAll().collectList().block();
 
         // then
         StepVerifier

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BillQueryParams {
+public class TransactionQueryParams {
 
     private String category;
 
@@ -23,7 +23,7 @@ public class BillQueryParams {
     private Integer pageSize = 10;
     private Integer pageNumber = 1;
     private SortDirection sortDirection = SortDirection.DESC;
-    private String sortColumn = "billNumber";
+    private String sortColumn = "transactionNumber";
 
     private String searchTerm;
 }

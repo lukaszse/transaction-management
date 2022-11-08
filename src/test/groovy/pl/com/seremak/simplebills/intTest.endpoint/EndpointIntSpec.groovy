@@ -7,7 +7,7 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestTemplate
 import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
-import pl.com.seremak.simplebills.repository.BillCrudRepository
+import pl.com.seremak.simplebills.repository.TransactionCrudRepository
 import pl.com.seremak.simplebills.service.SequentialIdService
 import spock.lang.Shared
 import spock.lang.Specification
@@ -31,7 +31,7 @@ class EndpointIntSpec extends Specification {
     StatisticsEndpoint statisticsEndpoint
 
     @Autowired
-    BillCrudRepository billCrudRepository
+    TransactionCrudRepository billCrudRepository
 
     @Autowired
     SequentialIdService sequentialIdService

@@ -4,13 +4,13 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.RequestEntity
-import pl.com.seremak.simplebills.model.Bill
+import pl.com.seremak.simplebills.model.Transaction
 
 import java.time.Instant
 
 import static pl.com.seremak.simplebills.intTest.endpoint.utils.EndpointSpecData.*
 
-class BillEndpointIntSpec extends EndpointIntSpec {
+class TransactionEndpointIntSpec extends EndpointIntSpec {
 
     def 'should create bill for user and then fetch created bill'() {
 
@@ -34,7 +34,7 @@ class BillEndpointIntSpec extends EndpointIntSpec {
                             .accept(MediaType.APPLICATION_JSON)
                             .header(AUTHORIZATION_HEADER_NAME, BASIC_TOKEN)
                             .build(),
-                    Bill.class)
+                    Transaction.class)
 
             assert fetchResponse != null
             assert fetchResponse.getStatusCode() == HttpStatus.OK
@@ -52,7 +52,7 @@ class BillEndpointIntSpec extends EndpointIntSpec {
                         .build()
 
         when: 'should fetch bill'
-        def response = client.exchange(request, Bill.class)
+        def response = client.exchange(request, Transaction.class)
 
         then:
         response != null

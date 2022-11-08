@@ -14,7 +14,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransactionDto implements Serializable {
+public class TransactionEventDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

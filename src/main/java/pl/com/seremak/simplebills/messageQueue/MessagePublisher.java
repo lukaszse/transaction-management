@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-import pl.com.seremak.simplebills.messageQueue.queueDto.TransactionDto;
+import pl.com.seremak.simplebills.messageQueue.queueDto.TransactionEventDto;
 
 import static pl.com.seremak.simplebills.config.RabbitMQConfig.TRANSACTION_QUEUE;
 import static pl.com.seremak.simplebills.config.RabbitMQConfig.USER_CREATION_QUEUE;
@@ -21,8 +21,8 @@ public class MessagePublisher {
         log.info("Message sent: queue={}, message={}", USER_CREATION_QUEUE, username);
     }
 
-    public void sendTransactionMessage(final TransactionDto transactionDto) {
-        rabbitTemplate.convertAndSend(TRANSACTION_QUEUE, transactionDto);
-        log.info("Message sent: queue={}, message={}", TRANSACTION_QUEUE, transactionDto);
+    public void sendTransactionMessage(final TransactionEventDto transactionEventDto) {
+        rabbitTemplate.convertAndSend(TRANSACTION_QUEUE, transactionEventDto);
+        log.info("Message sent: queue={}, message={}", TRANSACTION_QUEUE, transactionEventDto);
     }
 }

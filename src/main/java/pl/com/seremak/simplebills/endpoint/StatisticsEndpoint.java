@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.dto.StatisticsDto;
+import pl.com.seremak.simplebills.dto.TransactionQueryParams;
 import pl.com.seremak.simplebills.service.StatisticsService;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,7 @@ public class StatisticsEndpoint {
     private final StatisticsService service;
 
     @GetMapping(value = "/sum", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<BigDecimal>> calculateSum(final Mono<Principal> principal, final BillQueryParams params) {
+    public Mono<ResponseEntity<BigDecimal>> calculateSum(final Mono<Principal> principal, final TransactionQueryParams params) {
         return principal
                 .map(Principal::getName)
                 .doOnEach(userName -> log.info(CALCULATE_SUM_REQUEST_MESSAGE, userName))
@@ -41,7 +41,7 @@ public class StatisticsEndpoint {
     }
 
     @GetMapping(value = "/mean", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<BigDecimal>> calculateMean(final Mono<Principal> principal, final BillQueryParams params) {
+    public Mono<ResponseEntity<BigDecimal>> calculateMean(final Mono<Principal> principal, final TransactionQueryParams params) {
         return principal
                 .map(Principal::getName)
                 .doOnEach(userName -> log.info(CALCULATE_MEAN_REQUEST_MESSAGE, userName))
@@ -50,7 +50,7 @@ public class StatisticsEndpoint {
     }
 
     @GetMapping(value = "/user-statistics", produces = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<StatisticsDto>> getStatisticsForUser(final Mono<Principal> principal, final BillQueryParams params) {
+    public Mono<ResponseEntity<StatisticsDto>> getStatisticsForUser(final Mono<Principal> principal, final TransactionQueryParams params) {
         return principal
                 .map(Principal::getName)
                 .doOnEach(userName -> log.info(STATISTICS_REQUEST_MESSAGE, userName))

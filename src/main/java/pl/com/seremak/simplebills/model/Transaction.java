@@ -22,9 +22,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Bill extends VersionedEntity {
+public class Transaction extends VersionedEntity {
 
-    private Integer billNumber;
+    private Integer transactionNumber;
     @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
     private String user;
 

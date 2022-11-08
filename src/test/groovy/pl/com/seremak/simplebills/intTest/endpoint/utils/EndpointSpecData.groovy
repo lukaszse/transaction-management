@@ -1,7 +1,7 @@
 package pl.com.seremak.simplebills.intTest.endpoint.utils
 
-import pl.com.seremak.simplebills.model.Bill
 import pl.com.seremak.simplebills.model.Metadata
+import pl.com.seremak.simplebills.model.Transaction
 
 import java.time.Instant
 
@@ -29,9 +29,9 @@ class EndpointSpecData {
             final String category,
             final Instant date) {
 
-        Bill.builder()
+        Transaction.builder()
                 .amount(BigDecimal.valueOf(amount))
-                .billNumber(String.valueOf(billNumber))
+                .transactionNumber(String.valueOf(billNumber))
                 .description(DESCRIPTION_PATTERN.formatted(category))
                 .category(category)
                 .date(Instant.now())
@@ -46,7 +46,7 @@ class EndpointSpecData {
             final String category,
             final Instant date) {
 
-        Bill.builder()
+        Transaction.builder()
                 .amount(BigDecimal.valueOf(amount))
                 .category(category)
                 .description(FOOD_SHOPPING_DESCRIPTION)
