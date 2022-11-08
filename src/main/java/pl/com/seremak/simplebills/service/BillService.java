@@ -8,11 +8,10 @@ import pl.com.seremak.simplebills.dto.BillDto;
 import pl.com.seremak.simplebills.dto.BillQueryParams;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.messageQueue.MessagePublisher;
-import pl.com.seremak.simplebills.messageQueue.queueDto.BillActionMessage;
+import pl.com.seremak.simplebills.messageQueue.queueDto.TransactionDto;
 import pl.com.seremak.simplebills.model.Bill;
 import pl.com.seremak.simplebills.repository.BillCrudRepository;
 import pl.com.seremak.simplebills.repository.BillSearchRepository;
-import pl.com.seremak.simplebills.util.BillConverter;
 import pl.com.seremak.simplebills.util.OperationType;
 import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
@@ -22,7 +21,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import static pl.com.seremak.simplebills.messageQueue.queueDto.BillActionMessage.ActionType;
+import static pl.com.seremak.simplebills.conventer.BillConverter.*;
+import static pl.com.seremak.simplebills.messageQueue.queueDto.TransactionDto.ActionType;
 
 @Slf4j
 @Service
@@ -38,7 +38,7 @@ public class BillService {
 
 
     public Mono<Bill> createBill(final String username, final BillDto billDto) {
-        final Bill bill = BillConverter.toBill(billDto);
+        final Bill bill = toBill(billDto);
         return sequentialIdRepository.generateId(username)
                 .map(id -> setBillNumber(bill, id, username))
                 .map(BillService::setCurrentDateIfMissing)
@@ -70,12 +70,11 @@ public class BillService {
     }
 
     public Mono<Bill> updateBill(final String username, final BillDto billDto) {
-        final Bill bill = BillConverter.toBill(billDto);
+        final Bill bill = toBill(billDto);
         bill.setMetadata(null);
         return findBillByBillNumber(username, bill.getBillNumber())
                 .zipWith(billSearchRepository.updateBill(username, bill))
-                .doOnSuccess(billTuple ->
-                        prepareAndSendBillActionMessage(billTuple.getT1(), billTuple.getT2(), ActionType.UPDATE))
+                .doOnSuccess(billTuple -> prepareAndSendBillUpdateActionMessage(billTuple.getT1(), billTuple.getT2()))
                 .map(Tuple2::getT2)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(bill.getBillNumber()))));
     }
@@ -91,15 +90,13 @@ public class BillService {
     }
 
     private void prepareAndSendBillActionMessage(final Bill bill, final ActionType actionType) {
-        final BillActionMessage billActionMessage =
-                new BillActionMessage(bill.getUser(), bill.getCategory(), actionType, bill.getAmount());
+        final TransactionDto billActionMessage = toTransactionDto(bill, actionType);
         messagePublisher.sendBillActionMessage(billActionMessage);
     }
 
-    private void prepareAndSendBillActionMessage(final Bill oldBill, final Bill newBill, final ActionType actionType) {
+    private void prepareAndSendBillUpdateActionMessage(final Bill oldBill, final Bill newBill) {
         final BigDecimal amountDifference = newBill.getAmount().subtract(oldBill.getAmount());
-        final BillActionMessage billActionMessage =
-                new BillActionMessage(newBill.getUser(), newBill.getCategory(), actionType, amountDifference);
+        final TransactionDto billActionMessage = toTransactionDto(newBill, ActionType.UPDATE, amountDifference);
         messagePublisher.sendBillActionMessage(billActionMessage);
     }
 
@@ -118,7 +115,7 @@ public class BillService {
 
     private static BillDto setCategory(final Bill bill, final String newCategoryName) {
 
-        final BillDto billDto = BillConverter.toBillDto(bill);
+        final BillDto billDto = toBillDto(bill);
         billDto.setCategory(newCategoryName);
         return billDto;
     }

@@ -31,7 +31,6 @@ public class JwtExtractionHelper {
             });
         } catch (final Exception e) {
             final String errorMsg = EXTRACTING_TOKEN_ERROR_MSG.formatted(e.getMessage());
-            log.error(errorMsg);
             throw new AuthenticationServiceException(errorMsg);
         }
     }

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDeletionMessage implements Serializable {
+public class CategoryDeletionDto implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
