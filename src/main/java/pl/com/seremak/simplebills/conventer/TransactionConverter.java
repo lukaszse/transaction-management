@@ -29,7 +29,7 @@ public class TransactionConverter {
     public static TransactionDto toTransactionDto(final Transaction transaction) {
         final TransactionDto.TransactionDtoBuilder transactionDtoBuilder = TransactionDto.builder()
                 .user(transaction.getUser())
-                .type(transaction.getType().toString())
+                .type(transaction.getType().toString().toUpperCase())
                 .transactionNumber(transaction.getTransactionNumber())
                 .description(transaction.getDescription())
                 .amount(transaction.getAmount())
