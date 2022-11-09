@@ -18,10 +18,13 @@ import java.time.LocalDate;
 @AllArgsConstructor(staticName = "of")
 public class TransactionDto {
 
-    private Integer transactionNumber;
-
     @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
     private String user;
+
+    private Integer transactionNumber;
+
+    @NotNull(message = "Transaction type cannot be null")
+    private String type;
 
     @Nullable
     private LocalDate date;
@@ -35,4 +38,5 @@ public class TransactionDto {
     @NotNull(message = "Amount cannot be null")
     @Positive(message = "Amount cannot be negative")
     private BigDecimal amount;
+
 }

@@ -24,9 +24,17 @@ import java.time.Instant;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Transaction extends VersionedEntity {
 
-    private Integer transactionNumber;
-    @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Login must start with a letter and has 2 - 20 word characters (digits, letters, _)")
+    public enum Type {
+        INCOME, EXPENSE
+    }
+
+    @Pattern(regexp = "^[a-zA-Z]+\\w{1,19}", message = "Username must start with a letter and has 2 - 20 word characters (digits, letters, _)")
     private String user;
+
+    private Integer transactionNumber;
+
+    @NotNull(message = "Transaction type cannot be null")
+    private Type type;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     @Field(targetType = FieldType.DATE_TIME)
@@ -39,4 +47,5 @@ public class Transaction extends VersionedEntity {
     @Positive(message = "Amount cannot be negative")
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal amount;
+
 }
