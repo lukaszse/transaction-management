@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 import static pl.com.seremak.simplebills.util.EndpointUtils.prepareCreatedResponse;
 
 
@@ -47,7 +46,7 @@ public class TransactionEndpoint {
     private final JwtExtractionHelper jwtExtractionHelper;
 
 
-    @PostMapping(produces = TEXT_PLAIN_VALUE, consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Transaction>> createTransaction(@AuthenticationPrincipal final JwtAuthenticationToken principal,
                                                                @Valid @RequestBody final TransactionDto transactionDto) {
         final String username = jwtExtractionHelper.extractUsername(principal);
