@@ -15,12 +15,12 @@ import pl.com.seremak.simplebills.util.JwtExtractionHelper;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static pl.com.seremak.simplebills.util.EndpointUtils.prepareCreatedResponse;
 
 
 @Slf4j
@@ -55,7 +55,7 @@ public class TransactionEndpoint {
         return transactionService.createTransaction(username, transactionDto)
                 .doOnSuccess(createTransaction -> log.info(TRANSACTION_CREATED_MESSAGE, createTransaction.getUser(), createTransaction.getTransactionNumber()))
                 .map(Transaction::getTransactionNumber)
-                .map(transactionNumber -> createResponse(transactionNumber, TRANSACTION_URI_PATTERN));
+                .map(transactionNumber -> prepareCreatedResponse(TRANSACTION_URI_PATTERN, String.valueOf(transactionNumber)));
     }
 
     @GetMapping(value = "/{transactionNumber}", produces = APPLICATION_JSON_VALUE)
@@ -96,12 +96,6 @@ public class TransactionEndpoint {
         return transactionService.updateTransaction(username, transactionDto)
                 .doOnSuccess(updatedTransaction -> log.info(TRANSACTION_UPDATED_MESSAGE, updatedTransaction.getUser(), updatedTransaction.getTransactionNumber()))
                 .map(ResponseEntity::ok);
-    }
-
-    private static ResponseEntity<String> createResponse(final Integer identifier,
-                                                         final String uriPattern) {
-        return ResponseEntity.created(URI.create(String.format(uriPattern, identifier)))
-                .body(String.valueOf(identifier));
     }
 
     private static HttpHeaders prepareXTotalCountHeader(final Long count) {
