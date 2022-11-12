@@ -48,14 +48,13 @@ public class TransactionEndpoint {
 
 
     @PostMapping(produces = TEXT_PLAIN_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<String>> createTransaction(@AuthenticationPrincipal final JwtAuthenticationToken principal,
-                                                          @Valid @RequestBody final TransactionDto transactionDto) {
+    public Mono<ResponseEntity<Transaction>> createTransaction(@AuthenticationPrincipal final JwtAuthenticationToken principal,
+                                                               @Valid @RequestBody final TransactionDto transactionDto) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(TRANSACTION_CREATION_RECEIVED_LOG_MESSAGE, username);
         return transactionService.createTransaction(username, transactionDto)
                 .doOnSuccess(createTransaction -> log.info(TRANSACTION_CREATED_MESSAGE, createTransaction.getUser(), createTransaction.getTransactionNumber()))
-                .map(Transaction::getTransactionNumber)
-                .map(transactionNumber -> prepareCreatedResponse(TRANSACTION_URI_PATTERN, String.valueOf(transactionNumber)));
+                .map(transaction -> prepareCreatedResponse(TRANSACTION_URI_PATTERN, String.valueOf(transaction.getTransactionNumber()), transaction));
     }
 
     @GetMapping(value = "/{transactionNumber}", produces = APPLICATION_JSON_VALUE)
@@ -78,7 +77,7 @@ public class TransactionEndpoint {
                 .map(tuple -> ResponseEntity.ok().headers(prepareXTotalCountHeader(tuple.getT2())).body(tuple.getT1()));
     }
 
-    @DeleteMapping(value = "/{transactionNumber}", produces = APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{transactionNumber}")
     public Mono<ResponseEntity<Void>> deleteTransaction(final JwtAuthenticationToken principal, @PathVariable final Integer transactionNumber) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_TRANSACTION_REQUEST_LOG_MESSAGE, username, transactionNumber);
@@ -89,7 +88,7 @@ public class TransactionEndpoint {
 
     @PatchMapping(value = "/{transactionNumber}", produces = APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Transaction>> updateTransaction(final JwtAuthenticationToken principal,
-                                                               @RequestBody final TransactionDto transactionDto,
+                                                               @Valid @RequestBody final TransactionDto transactionDto,
                                                                @PathVariable final Integer transactionNumber) {
         final String username = jwtExtractionHelper.extractUsername(principal);
         log.info(DELETE_UPDATE_REQUEST_LOG_MESSAGE, username, transactionNumber);
