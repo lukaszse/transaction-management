@@ -7,6 +7,8 @@ import pl.com.seremak.simplebills.util.DateUtils;
 
 import java.math.BigDecimal;
 
+import static pl.com.seremak.simplebills.model.Transaction.Type.EXPENSE;
+import static pl.com.seremak.simplebills.model.Transaction.Type.valueOf;
 import static pl.com.seremak.simplebills.util.DateUtils.toInstantUTC;
 
 public class TransactionConverter {
@@ -14,10 +16,10 @@ public class TransactionConverter {
     public static Transaction toTransaction(final TransactionDto transactionDto) {
         final Transaction.TransactionBuilder transactionBuilder = Transaction.builder()
                 .user(transactionDto.getUser())
-                .type(Transaction.Type.valueOf(transactionDto.getType().toUpperCase()))
+                .type(valueOf(transactionDto.getType().toUpperCase()))
                 .transactionNumber(transactionDto.getTransactionNumber())
                 .description(transactionDto.getDescription())
-                .amount(transactionDto.getAmount())
+                .amount(normalizeAmount(transactionDto.getAmount(), transactionDto.getType()))
                 .category(transactionDto.getCategory());
 
         toInstantUTC(transactionDto.getDate())
@@ -32,7 +34,7 @@ public class TransactionConverter {
                 .type(transaction.getType().toString().toUpperCase())
                 .transactionNumber(transaction.getTransactionNumber())
                 .description(transaction.getDescription())
-                .amount(transaction.getAmount())
+                .amount(normalizeAmount(transaction.getAmount(), transaction.getType()))
                 .category(transaction.getCategory());
 
         DateUtils.toLocalDate(transaction.getDate())
@@ -48,14 +50,23 @@ public class TransactionConverter {
 
     public static TransactionEventDto toTransactionDto(final Transaction transaction,
                                                        final TransactionEventDto.ActionType actionType,
-                                                       final BigDecimal amount) {
+                                                       final BigDecimal amountDiff) {
         return TransactionEventDto.builder()
                 .username(transaction.getUser())
                 .categoryName(transaction.getCategory())
                 .type(actionType)
-                .amount(amount)
+                .amount(normalizeAmount(amountDiff, transaction.getType()))
                 .date(transaction.getDate())
                 .build();
+    }
 
+    private static BigDecimal normalizeAmount(final BigDecimal amount, final Transaction.Type transactionType) {
+        return EXPENSE.equals(transactionType) ?
+                amount.abs().negate() : amount.abs();
+    }
+
+    private static BigDecimal normalizeAmount(final BigDecimal amount, final String transactionTypeStr) {
+        final Transaction.Type transactionType = valueOf(transactionTypeStr);
+        return normalizeAmount(amount, transactionType);
     }
 }
