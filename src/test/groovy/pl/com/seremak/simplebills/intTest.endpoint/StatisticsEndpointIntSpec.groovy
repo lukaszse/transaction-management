@@ -13,11 +13,11 @@ class StatisticsEndpointIntSpec extends EndpointIntSpec {
 
     def 'should retrieve (repository level initial test)'() {
         when:
-        def bill = billCrudRepository.findByUserAndBillNumber(TEST_USER, "1").block()
+        def bill = billCrudRepository.findByUserAndTransactionNumber(TEST_USER, "1").block()
 
         then:
         bill != null
-        bill.getBillNumber() == "1"
+        bill.getTransactionNumber() == "1"
         bill.getCategory() == FOOD
     }
 

@@ -7,10 +7,8 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestTemplate
 import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
-import pl.com.seremak.simplebills.repository.BillCrudRepository
-import pl.com.seremak.simplebills.repository.UserCrudRepository
+import pl.com.seremak.simplebills.repository.TransactionCrudRepository
 import pl.com.seremak.simplebills.service.SequentialIdService
-import pl.com.seremak.simplebills.service.UserCrudService
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
@@ -33,13 +31,7 @@ class EndpointIntSpec extends Specification {
     StatisticsEndpoint statisticsEndpoint
 
     @Autowired
-    BillCrudRepository billCrudRepository
-
-    @Autowired
-    UserCrudRepository userCrudRepository
-
-    @Autowired
-    UserCrudService userCrudService
+    TransactionCrudRepository billCrudRepository
 
     @Autowired
     SequentialIdService sequentialIdService
@@ -53,7 +45,6 @@ class EndpointIntSpec extends Specification {
     def setup() {
         // populate database for tests
         billCrudRepository.deleteAll().block()
-        userCrudRepository.deleteAll().block()
         tryToCleanSequentialIdRepository()
         IntStream.range(1, 10)
                 .forEach(i ->
@@ -61,14 +52,11 @@ class EndpointIntSpec extends Specification {
         IntStream.range(10, 12)
                 .forEach(i ->
                         billCrudRepository.save(prepareBillForEndpointTest(i, 200 * i, TRAVEL, Instant.now().minus(360 * i, ChronoUnit.DAYS))).block())
-        userCrudService.createUser(createTestUser(TEST_USER)).block()
-        userCrudService.createUser(createTestUser(TEST_USER_2)).block()
 
     }
 
     def cleanup() {
         billCrudRepository.deleteAll().block()
-        userCrudRepository.deleteAll().block()
         tryToCleanSequentialIdRepository()
     }
 

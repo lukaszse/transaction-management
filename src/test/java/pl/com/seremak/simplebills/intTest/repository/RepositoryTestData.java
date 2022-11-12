@@ -1,6 +1,6 @@
 package pl.com.seremak.simplebills.intTest.repository;
 
-import pl.com.seremak.simplebills.model.Bill;
+import pl.com.seremak.simplebills.model.Transaction;
 
 public class RepositoryTestData {
 
@@ -8,10 +8,10 @@ public class RepositoryTestData {
     public static final String GROCERY_CATEGORY = "grocery";
     public static final String TEST_USER = "testuser";
 
-    public static Bill prepareBill(final String billNumber) {
-        return Bill.builder()
+    public static Transaction prepareBill(final Integer billNumber) {
+        return Transaction.builder()
                 .user(TEST_USER)
-                .billNumber(billNumber)
+                .transactionNumber(billNumber)
                 .description(BIEDRONKA_SHOPPING)
                 .category(GROCERY_CATEGORY)
                 .build();

@@ -21,16 +21,14 @@ public class SequentialIdService {
     public static final String SEQUENTIAL_ID_NOT_FOUND_ERROR_MESSAGE = "Sequential id for user=%s not found";
     private final ReactiveMongoTemplate mongoTemplate;
 
-    public Mono<String> generateId(final String user) {
+    public Mono<Integer> generateId(final String user) {
         return mongoTemplate.findAndModify(
                         prepareFindUserQuery(user),
                         prepareSequentialIdIncrementUpdate(),
                         new FindAndModifyOptions().returnNew(true),
                         SequentialId.class)
                 .map(SequentialId::getSequentialId)
-                .map(String::valueOf)
                 .switchIfEmpty(insertFirstSequentialId(user));
-        // todo implement error handling
     }
 
     public Mono<Void> deleteUser(final String user) {
@@ -39,23 +37,22 @@ public class SequentialIdService {
                 .then();
     }
 
-    private Mono<String> insertFirstSequentialId(final String user) {
+    private Mono<Integer> insertFirstSequentialId(final String user) {
         return mongoTemplate.insert(buildFirstSequentialId(user))
-                .map(SequentialId::getSequentialId)
-                .map(String::valueOf);
+                .map(SequentialId::getSequentialId);
     }
 
-    private Query prepareFindUserQuery(final String user) {
+    private static Query prepareFindUserQuery(final String user) {
         return new Query()
                 .addCriteria(Criteria.where(ID_FIELD).is(user));
     }
 
-    private Update prepareSequentialIdIncrementUpdate() {
+    private static Update prepareSequentialIdIncrementUpdate() {
         return new Update()
                 .inc(SEQUENTIAL_ID_FIELD, 1);
     }
 
-    private SequentialId buildFirstSequentialId(final String user) {
+    private static SequentialId buildFirstSequentialId(final String user) {
         return new SequentialId(user, STARTING_ID);
     }
 }

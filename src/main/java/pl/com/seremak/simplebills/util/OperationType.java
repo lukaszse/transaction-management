@@ -1,4 +1,4 @@
-package pl.com.seremak.simplebills.service.util;
+package pl.com.seremak.simplebills.util;
 
 public enum OperationType {
 
