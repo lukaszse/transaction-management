@@ -17,6 +17,7 @@ import pl.com.seremak.simplebills.commons.utils.VersionedEntityUtils;
 import pl.com.seremak.simplebills.messageQueue.MessagePublisher;
 import pl.com.seremak.simplebills.repository.TransactionCrudRepository;
 import pl.com.seremak.simplebills.repository.TransactionSearchRepository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -42,7 +43,11 @@ public class TransactionService {
 
     public Mono<Transaction> createTransaction(final String username, final TransactionDto transactionDto) {
         final Transaction transaction = toTransaction(username, transactionDto);
-        return sequentialIdRepository.generateId(username)
+        return createTransaction(transaction);
+    }
+
+    public Mono<Transaction> createTransaction(final Transaction transaction) {
+        return sequentialIdRepository.generateId(transaction.getUser())
                 .map(id -> setTransactionNumber(transaction, id))
                 .map(TransactionService::setCurrentDateIfMissing)
                 .map(VersionedEntityUtils::setMetadata)
@@ -82,20 +87,20 @@ public class TransactionService {
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(transaction.getTransactionNumber()))));
     }
 
-    public void handleCategoryDeletion(final CategoryEventDto categoryEventDto) {
+    public Flux<Transaction> handleCategoryDeletion(final CategoryEventDto categoryEventDto) {
         if (ActionType.DELETION.equals(categoryEventDto.getActionType())) {
-            changeTransactionCategory(categoryEventDto.getUsername(), categoryEventDto.getCategoryName(), categoryEventDto.getReplacementCategoryName());
-        }
+            return changeTransactionCategory(categoryEventDto.getUsername(), categoryEventDto.getCategoryName(), categoryEventDto.getReplacementCategoryName());
+        } else return Flux.empty();
     }
 
-    private void changeTransactionCategory(final String username,
-                                           final String oldCategoryName,
-                                           final String newCategoryName) {
-        transactionCrudRepository.findByUserAndCategory(username, oldCategoryName)
+    private Flux<Transaction> changeTransactionCategory(final String username,
+                                                        final String oldCategoryName,
+                                                        final String newCategoryName) {
+        return transactionCrudRepository.findByUserAndCategory(username, oldCategoryName)
                 .map(transaction -> updateCategory(transaction, newCategoryName))
                 .flatMap(transactionWithNewCategory -> updateTransaction(username, transactionWithNewCategory))
-                .doOnNext(updatedTransaction -> log.info("A transaction with transactionNumber={} category changed from {} to {}", updatedTransaction.getTransactionNumber(), oldCategoryName, updatedTransaction.getCategory()))
-                .subscribe();
+                .doOnNext(updatedTransaction -> log.info("A transaction with transactionNumber={} category changed from {} to {}",
+                        updatedTransaction.getTransactionNumber(), oldCategoryName, updatedTransaction.getCategory()));
     }
 
     private void prepareAndSendTransactionEventMessage(final Transaction transaction, final ActionType actionType) {
