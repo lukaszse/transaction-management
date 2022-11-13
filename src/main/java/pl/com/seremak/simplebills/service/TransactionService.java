@@ -8,6 +8,7 @@ import pl.com.seremak.simplebills.commons.converter.TransactionConverter;
 import pl.com.seremak.simplebills.commons.dto.http.TransactionDto;
 import pl.com.seremak.simplebills.commons.dto.http.TransactionQueryParams;
 import pl.com.seremak.simplebills.commons.dto.queue.ActionType;
+import pl.com.seremak.simplebills.commons.dto.queue.CategoryEventDto;
 import pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto;
 import pl.com.seremak.simplebills.commons.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.commons.model.Transaction;
@@ -81,9 +82,15 @@ public class TransactionService {
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(transaction.getTransactionNumber()))));
     }
 
-    public void changeTransactionCategory(final String username,
-                                          final String oldCategoryName,
-                                          final String newCategoryName) {
+    public void handleCategoryDeletion(final CategoryEventDto categoryEventDto) {
+        if (ActionType.DELETION.equals(categoryEventDto.getActionType())) {
+            changeTransactionCategory(categoryEventDto.getUsername(), categoryEventDto.getCategoryName(), categoryEventDto.getReplacementCategoryName());
+        }
+    }
+
+    private void changeTransactionCategory(final String username,
+                                           final String oldCategoryName,
+                                           final String newCategoryName) {
         transactionCrudRepository.findByUserAndCategory(username, oldCategoryName)
                 .map(transaction -> updateCategory(transaction, newCategoryName))
                 .flatMap(transactionWithNewCategory -> updateTransaction(username, transactionWithNewCategory))
