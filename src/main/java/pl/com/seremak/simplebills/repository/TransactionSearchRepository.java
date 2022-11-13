@@ -34,9 +34,9 @@ public class TransactionSearchRepository {
                 Transaction.class);
     }
 
-    public Mono<Transaction> updateTransaction(final String username, final Transaction transaction) {
+    public Mono<Transaction> updateTransaction(final Transaction transaction) {
         return mongoTemplate.findAndModify(
-                prepareFindTransactionQuery(username, transaction.getTransactionNumber()),
+                prepareFindTransactionQuery(transaction.getUser(), transaction.getTransactionNumber()),
                 preparePartialUpdateQuery(transaction, Transaction.class),
                 new FindAndModifyOptions().returnNew(true),
                 Transaction.class);

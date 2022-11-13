@@ -41,9 +41,9 @@ public class TransactionService {
 
 
     public Mono<Transaction> createTransaction(final String username, final TransactionDto transactionDto) {
-        final Transaction transaction = toTransaction(transactionDto);
+        final Transaction transaction = toTransaction(username, transactionDto);
         return sequentialIdRepository.generateId(username)
-                .map(id -> setTransactionNumber(transaction, id, username))
+                .map(id -> setTransactionNumber(transaction, id))
                 .map(TransactionService::setCurrentDateIfMissing)
                 .map(VersionedEntityUtils::setMetadata)
                 .flatMap(transactionCrudRepository::save)
@@ -73,10 +73,10 @@ public class TransactionService {
     }
 
     public Mono<Transaction> updateTransaction(final String username, final TransactionDto transactionDto) {
-        final Transaction transaction = toTransaction(transactionDto);
+        final Transaction transaction = toTransaction(username, transactionDto);
         transaction.setMetadata(null);
         return findTransactionByTransactionNumber(username, transaction.getTransactionNumber())
-                .zipWith(transactionSearchRepository.updateTransaction(username, transaction))
+                .zipWith(transactionSearchRepository.updateTransaction(transaction))
                 .doOnSuccess(TransactionTuple -> prepareAndSendTransactionUpdateActionMessage(TransactionTuple.getT1(), TransactionTuple.getT2()))
                 .map(Tuple2::getT2)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(transaction.getTransactionNumber()))));
@@ -109,8 +109,7 @@ public class TransactionService {
         messagePublisher.sendTransactionMessage(transactionEventDto);
     }
 
-    private static Transaction setTransactionNumber(final Transaction transaction, final Integer id, final String username) {
-        transaction.setUser(username);
+    private static Transaction setTransactionNumber(final Transaction transaction, final Integer id) {
         transaction.setTransactionNumber(id);
         return transaction;
     }
