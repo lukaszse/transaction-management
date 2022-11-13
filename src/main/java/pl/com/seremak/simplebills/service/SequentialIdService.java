@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import pl.com.seremak.simplebills.commons.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.commons.model.SequentialId;
-import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
 @Component
