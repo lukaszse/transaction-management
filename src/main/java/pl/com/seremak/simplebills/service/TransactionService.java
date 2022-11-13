@@ -4,17 +4,17 @@ package pl.com.seremak.simplebills.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.conventer.TransactionConverter;
-import pl.com.seremak.simplebills.dto.TransactionDto;
-import pl.com.seremak.simplebills.dto.TransactionQueryParams;
+import pl.com.seremak.simplebills.commons.converter.TransactionConverter;
+import pl.com.seremak.simplebills.commons.dto.http.TransactionDto;
+import pl.com.seremak.simplebills.commons.dto.http.TransactionQueryParams;
+import pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto;
+import pl.com.seremak.simplebills.commons.model.Transaction;
+import pl.com.seremak.simplebills.commons.utils.OperationType;
+import pl.com.seremak.simplebills.commons.utils.VersionedEntityUtils;
 import pl.com.seremak.simplebills.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.messageQueue.MessagePublisher;
-import pl.com.seremak.simplebills.messageQueue.queueDto.TransactionEventDto;
-import pl.com.seremak.simplebills.model.Transaction;
 import pl.com.seremak.simplebills.repository.TransactionCrudRepository;
 import pl.com.seremak.simplebills.repository.TransactionSearchRepository;
-import pl.com.seremak.simplebills.util.OperationType;
-import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -22,9 +22,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import static pl.com.seremak.simplebills.conventer.TransactionConverter.toTransaction;
-import static pl.com.seremak.simplebills.conventer.TransactionConverter.toTransactionDto;
-import static pl.com.seremak.simplebills.messageQueue.queueDto.TransactionEventDto.ActionType;
+import static pl.com.seremak.simplebills.commons.converter.TransactionConverter.toTransaction;
+import static pl.com.seremak.simplebills.commons.converter.TransactionConverter.toTransactionDto;
+import static pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto.ActionType;
 
 @Slf4j
 @Service

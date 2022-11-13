@@ -1,7 +1,7 @@
 package pl.com.seremak.simplebills.repository;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import pl.com.seremak.simplebills.model.UserActivity;
+import pl.com.seremak.simplebills.commons.model.UserActivity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

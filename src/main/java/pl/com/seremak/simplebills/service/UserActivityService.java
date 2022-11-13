@@ -3,10 +3,10 @@ package pl.com.seremak.simplebills.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.com.seremak.simplebills.commons.model.UserActivity;
+import pl.com.seremak.simplebills.commons.utils.VersionedEntityUtils;
 import pl.com.seremak.simplebills.messageQueue.MessagePublisher;
-import pl.com.seremak.simplebills.model.UserActivity;
 import pl.com.seremak.simplebills.repository.UserActivityRepository;
-import pl.com.seremak.simplebills.util.VersionedEntityUtils;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -14,12 +14,12 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UserActivityService {
 
-    private final MessagePublisher messagePublisher;
 
     public static final String MESSAGE_TO_CATEGORY_SERVICE_IS_BEING_SENT_MSG = """
             The user is logging in for the first time. A message to category service to create standard categories set is being sent""";
     public static final String USER_EXISTS_MSG = """
             User already exists. No message to create standard categories is sent""";
+    private final MessagePublisher messagePublisher;
     private final UserActivityRepository userActivityRepository;
 
     public Mono<UserActivity> addUserLogging(final String username) {

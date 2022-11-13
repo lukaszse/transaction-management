@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.client.RestTemplate
-import pl.com.seremak.simplebills.endpoint.StatisticsEndpoint
 import pl.com.seremak.simplebills.repository.TransactionCrudRepository
 import pl.com.seremak.simplebills.service.SequentialIdService
 import spock.lang.Shared

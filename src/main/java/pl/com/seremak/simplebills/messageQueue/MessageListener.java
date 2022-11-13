@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
-import pl.com.seremak.simplebills.messageQueue.queueDto.CategoryDeletionDto;
+import pl.com.seremak.simplebills.commons.dto.queue.CategoryDeletionDto;
 import pl.com.seremak.simplebills.service.TransactionService;
 
 import static pl.com.seremak.simplebills.config.RabbitMQConfig.CATEGORY_DELETION_QUEUE;
