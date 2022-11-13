@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.com.seremak.simplebills.commons.converter.TransactionConverter;
 import pl.com.seremak.simplebills.commons.dto.http.TransactionDto;
 import pl.com.seremak.simplebills.commons.dto.http.TransactionQueryParams;
+import pl.com.seremak.simplebills.commons.dto.queue.ActionType;
 import pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto;
 import pl.com.seremak.simplebills.commons.exceptions.NotFoundException;
 import pl.com.seremak.simplebills.commons.model.Transaction;
@@ -24,7 +25,6 @@ import java.util.List;
 
 import static pl.com.seremak.simplebills.commons.converter.TransactionConverter.toTransaction;
 import static pl.com.seremak.simplebills.commons.converter.TransactionConverter.toTransactionDto;
-import static pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto.ActionType;
 
 @Slf4j
 @Service
