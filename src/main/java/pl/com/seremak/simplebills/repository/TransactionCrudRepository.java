@@ -14,8 +14,4 @@ public interface TransactionCrudRepository extends ReactiveCrudRepository<Transa
     Mono<Transaction> deleteByUserAndTransactionNumber(final String user, final Integer transactionNumber);
 
     Mono<Transaction> findByUserAndTransactionNumber(final String user, final Integer transactionNumber);
-
-    Mono<Long> countByUserAndCategory(final String user, final String category);
-
-    Mono<Long> countByUser(final String user);
 }

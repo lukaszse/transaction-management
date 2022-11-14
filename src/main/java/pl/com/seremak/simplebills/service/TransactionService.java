@@ -77,8 +77,8 @@ public class TransactionService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, transactionNumber, username, error.getMessage()));
     }
 
-    public Mono<Transaction> updateTransaction(final String username, final TransactionDto transactionDto) {
-        final Transaction transaction = toTransaction(username, transactionDto);
+    public Mono<Transaction> updateTransaction(final String username, final Integer transactionNumber, final TransactionDto transactionDto) {
+        final Transaction transaction = toTransaction(username, transactionNumber, transactionDto);
         transaction.setMetadata(null);
         return findTransactionByTransactionNumber(username, transaction.getTransactionNumber())
                 .zipWith(transactionSearchRepository.updateTransaction(transaction))
@@ -98,7 +98,8 @@ public class TransactionService {
                                                         final String newCategoryName) {
         return transactionCrudRepository.findByUserAndCategory(username, oldCategoryName)
                 .map(transaction -> updateCategory(transaction, newCategoryName))
-                .flatMap(transactionWithNewCategory -> updateTransaction(username, transactionWithNewCategory))
+                .flatMap(transactionWithNewCategory ->
+                        updateTransaction(username, transactionWithNewCategory.getTransactionNumber(), transactionWithNewCategory))
                 .doOnNext(updatedTransaction -> log.info("A transaction with transactionNumber={} category changed from {} to {}",
                         updatedTransaction.getTransactionNumber(), oldCategoryName, updatedTransaction.getCategory()));
     }
