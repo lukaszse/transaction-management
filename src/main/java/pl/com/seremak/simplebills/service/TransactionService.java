@@ -106,13 +106,13 @@ public class TransactionService {
 
     private void prepareAndSendTransactionEventMessage(final Transaction transaction, final ActionType actionType) {
         final TransactionEventDto transactionEventMessage = toTransactionDto(transaction, actionType);
-        messagePublisher.sendTransactionMessage(transactionEventMessage);
+        messagePublisher.sendTransactionEventMessage(transactionEventMessage);
     }
 
     private void prepareAndSendTransactionUpdateActionMessage(final Transaction oldTransaction, final Transaction newTransaction) {
         final BigDecimal amountDifference = newTransaction.getAmount().subtract(oldTransaction.getAmount());
         final TransactionEventDto transactionEventDto = toTransactionDto(newTransaction, ActionType.UPDATE, amountDifference);
-        messagePublisher.sendTransactionMessage(transactionEventDto);
+        messagePublisher.sendTransactionEventMessage(transactionEventDto);
     }
 
     private static Transaction setTransactionNumber(final Transaction transaction, final Integer id) {

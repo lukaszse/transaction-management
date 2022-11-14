@@ -13,16 +13,13 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static pl.com.seremak.simplebills.commons.constants.MessageQueue.*;
+
 @Slf4j
 @EnableRabbit
 @Configuration
 @RequiredArgsConstructor
 public class RabbitMQConfig {
-
-    public static final String USER_CREATION_QUEUE = "userCreation";
-    public static final String CATEGORY_QUEUE = "categoryQueue";
-    public static final String TRANSACTION_QUEUE = "transaction";
-    public static final String TRANSACTION_CREATION_REQUEST_QUEUE = "transactionCreationRequest";
 
 
     private final CachingConnectionFactory cachingConnectionFactory;
@@ -57,11 +54,16 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue categoryDeletionQueue() {
-        return new Queue(CATEGORY_QUEUE, false);
+        return new Queue(CATEGORY_EVENT_QUEUE, false);
     }
 
     @Bean
-    public Queue billActionQueue() {
-        return new Queue(TRANSACTION_QUEUE, false);
+    public Queue transactionEventQueue() {
+        return new Queue(TRANSACTION_EVENT_QUEUE, false);
+    }
+
+    @Bean
+    public Queue transactionCreationRequest() {
+        return new Queue(TRANSACTION_CREATION_REQUEST_QUEUE, false);
     }
 }
