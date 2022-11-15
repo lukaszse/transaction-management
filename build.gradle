@@ -18,6 +18,13 @@ configurations {
 repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven {
+        url 'https://repo.repsy.io/mvn/llseremak/simplebills'
+        credentials {
+            username 'llseremak'
+            password 'Simple1'
+        }
+    }
 }
 
 ext {
@@ -25,6 +32,7 @@ ext {
 }
 
 dependencies {
+    implementation 'pl.com.seremak.simplebills:commons:0.0.27'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     implementation 'org.springframework.boot:spring-boot-starter-validation'

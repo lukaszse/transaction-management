@@ -6,14 +6,14 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-import pl.com.seremak.simplebills.dto.TransactionQueryParams;
-import pl.com.seremak.simplebills.model.Transaction;
+import pl.com.seremak.simplebills.commons.dto.http.TransactionQueryParams;
+import pl.com.seremak.simplebills.commons.model.Transaction;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static pl.com.seremak.simplebills.util.MongoQueryHelper.preparePartialUpdateQuery;
-import static pl.com.seremak.simplebills.util.TransactionQueryUtils.prepareFindByCategoryQuery;
-import static pl.com.seremak.simplebills.util.TransactionQueryUtils.prepareFindByCategoryQueryPageable;
+import static pl.com.seremak.simplebills.commons.utils.MongoQueryHelper.preparePartialUpdateQuery;
+import static pl.com.seremak.simplebills.commons.utils.TransactionQueryUtils.prepareFindByCategoryQuery;
+import static pl.com.seremak.simplebills.commons.utils.TransactionQueryUtils.prepareFindByCategoryQueryPageable;
 
 @Repository
 @RequiredArgsConstructor
@@ -34,9 +34,9 @@ public class TransactionSearchRepository {
                 Transaction.class);
     }
 
-    public Mono<Transaction> updateTransaction(final String username, final Transaction transaction) {
+    public Mono<Transaction> updateTransaction(final Transaction transaction) {
         return mongoTemplate.findAndModify(
-                prepareFindTransactionQuery(username, transaction.getTransactionNumber()),
+                prepareFindTransactionQuery(transaction.getUser(), transaction.getTransactionNumber()),
                 preparePartialUpdateQuery(transaction, Transaction.class),
                 new FindAndModifyOptions().returnNew(true),
                 Transaction.class);

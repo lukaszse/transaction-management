@@ -4,17 +4,20 @@ package pl.com.seremak.simplebills.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.com.seremak.simplebills.conventer.TransactionConverter;
-import pl.com.seremak.simplebills.dto.TransactionDto;
-import pl.com.seremak.simplebills.dto.TransactionQueryParams;
-import pl.com.seremak.simplebills.exceptions.NotFoundException;
+import pl.com.seremak.simplebills.commons.converter.TransactionConverter;
+import pl.com.seremak.simplebills.commons.dto.http.TransactionDto;
+import pl.com.seremak.simplebills.commons.dto.http.TransactionQueryParams;
+import pl.com.seremak.simplebills.commons.dto.queue.ActionType;
+import pl.com.seremak.simplebills.commons.dto.queue.CategoryEventDto;
+import pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto;
+import pl.com.seremak.simplebills.commons.exceptions.NotFoundException;
+import pl.com.seremak.simplebills.commons.model.Transaction;
+import pl.com.seremak.simplebills.commons.utils.OperationType;
+import pl.com.seremak.simplebills.commons.utils.VersionedEntityUtils;
 import pl.com.seremak.simplebills.messageQueue.MessagePublisher;
-import pl.com.seremak.simplebills.messageQueue.queueDto.TransactionEventDto;
-import pl.com.seremak.simplebills.model.Transaction;
 import pl.com.seremak.simplebills.repository.TransactionCrudRepository;
 import pl.com.seremak.simplebills.repository.TransactionSearchRepository;
-import pl.com.seremak.simplebills.util.OperationType;
-import pl.com.seremak.simplebills.util.VersionedEntityUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -22,9 +25,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import static pl.com.seremak.simplebills.conventer.TransactionConverter.toTransaction;
-import static pl.com.seremak.simplebills.conventer.TransactionConverter.toTransactionDto;
-import static pl.com.seremak.simplebills.messageQueue.queueDto.TransactionEventDto.ActionType;
+import static pl.com.seremak.simplebills.commons.converter.TransactionConverter.toTransaction;
+import static pl.com.seremak.simplebills.commons.converter.TransactionConverter.toTransactionDto;
 
 @Slf4j
 @Service
@@ -40,9 +42,13 @@ public class TransactionService {
 
 
     public Mono<Transaction> createTransaction(final String username, final TransactionDto transactionDto) {
-        final Transaction transaction = toTransaction(transactionDto);
-        return sequentialIdRepository.generateId(username)
-                .map(id -> setTransactionNumber(transaction, id, username))
+        final Transaction transaction = toTransaction(username, transactionDto);
+        return createTransaction(transaction);
+    }
+
+    public Mono<Transaction> createTransaction(final Transaction transaction) {
+        return sequentialIdRepository.generateId(transaction.getUser())
+                .map(id -> setTransactionNumber(transaction, id))
                 .map(TransactionService::setCurrentDateIfMissing)
                 .map(VersionedEntityUtils::setMetadata)
                 .flatMap(transactionCrudRepository::save)
@@ -71,39 +77,45 @@ public class TransactionService {
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, transactionNumber, username, error.getMessage()));
     }
 
-    public Mono<Transaction> updateTransaction(final String username, final TransactionDto transactionDto) {
-        final Transaction transaction = toTransaction(transactionDto);
+    public Mono<Transaction> updateTransaction(final String username, final Integer transactionNumber, final TransactionDto transactionDto) {
+        final Transaction transaction = toTransaction(username, transactionNumber, transactionDto);
         transaction.setMetadata(null);
         return findTransactionByTransactionNumber(username, transaction.getTransactionNumber())
-                .zipWith(transactionSearchRepository.updateTransaction(username, transaction))
+                .zipWith(transactionSearchRepository.updateTransaction(transaction))
                 .doOnSuccess(TransactionTuple -> prepareAndSendTransactionUpdateActionMessage(TransactionTuple.getT1(), TransactionTuple.getT2()))
                 .map(Tuple2::getT2)
                 .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(transaction.getTransactionNumber()))));
     }
 
-    public void changeTransactionCategory(final String username,
-                                          final String oldCategoryName,
-                                          final String newCategoryName) {
-        transactionCrudRepository.findByUserAndCategory(username, oldCategoryName)
+    public Flux<Transaction> handleCategoryDeletion(final CategoryEventDto categoryEventDto) {
+        if (ActionType.DELETION.equals(categoryEventDto.getActionType())) {
+            return changeTransactionCategory(categoryEventDto.getUsername(), categoryEventDto.getCategoryName(), categoryEventDto.getReplacementCategoryName());
+        } else return Flux.empty();
+    }
+
+    private Flux<Transaction> changeTransactionCategory(final String username,
+                                                        final String oldCategoryName,
+                                                        final String newCategoryName) {
+        return transactionCrudRepository.findByUserAndCategory(username, oldCategoryName)
                 .map(transaction -> updateCategory(transaction, newCategoryName))
-                .flatMap(transactionWithNewCategory -> updateTransaction(username, transactionWithNewCategory))
-                .doOnNext(updatedTransaction -> log.info("A transaction with transactionNumber={} category changed from {} to {}", updatedTransaction.getTransactionNumber(), oldCategoryName, updatedTransaction.getCategory()))
-                .subscribe();
+                .flatMap(transactionWithNewCategory ->
+                        updateTransaction(username, transactionWithNewCategory.getTransactionNumber(), transactionWithNewCategory))
+                .doOnNext(updatedTransaction -> log.info("A transaction with transactionNumber={} category changed from {} to {}",
+                        updatedTransaction.getTransactionNumber(), oldCategoryName, updatedTransaction.getCategory()));
     }
 
     private void prepareAndSendTransactionEventMessage(final Transaction transaction, final ActionType actionType) {
         final TransactionEventDto transactionEventMessage = toTransactionDto(transaction, actionType);
-        messagePublisher.sendTransactionMessage(transactionEventMessage);
+        messagePublisher.sendTransactionEventMessage(transactionEventMessage);
     }
 
     private void prepareAndSendTransactionUpdateActionMessage(final Transaction oldTransaction, final Transaction newTransaction) {
         final BigDecimal amountDifference = newTransaction.getAmount().subtract(oldTransaction.getAmount());
         final TransactionEventDto transactionEventDto = toTransactionDto(newTransaction, ActionType.UPDATE, amountDifference);
-        messagePublisher.sendTransactionMessage(transactionEventDto);
+        messagePublisher.sendTransactionEventMessage(transactionEventDto);
     }
 
-    private static Transaction setTransactionNumber(final Transaction transaction, final Integer id, final String username) {
-        transaction.setUser(username);
+    private static Transaction setTransactionNumber(final Transaction transaction, final Integer id) {
         transaction.setTransactionNumber(id);
         return transaction;
     }
