@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import pl.com.seremak.simplebills.commons.dto.queue.TransactionEventDto;
+import pl.com.seremak.simplebills.commons.model.Category;
 
-import static pl.com.seremak.simplebills.commons.constants.MessageQueue.TRANSACTION_EVENT_QUEUE;
-import static pl.com.seremak.simplebills.commons.constants.MessageQueue.USER_CREATION_QUEUE;
+import static pl.com.seremak.simplebills.commons.constants.MessageQueue.*;
 
 @Slf4j
 @Component
@@ -17,12 +18,18 @@ public class MessagePublisher {
     private final RabbitTemplate rabbitTemplate;
 
     public void sendUserCreationMessage(final String username) {
-        rabbitTemplate.convertAndSend(USER_CREATION_QUEUE, username);
-        log.info("Message sent: queue={}, message={}", USER_CREATION_QUEUE, username);
+        sendRabbitMessage(USER_CREATION_SIMPLE_BILLS_QUEUE, username);
     }
 
     public void sendTransactionEventMessage(final TransactionEventDto transactionEventDto) {
-        rabbitTemplate.convertAndSend(TRANSACTION_EVENT_QUEUE, transactionEventDto);
-        log.info("Message sent: queue={}, message={}", TRANSACTION_EVENT_QUEUE, transactionEventDto);
+        sendRabbitMessage(TRANSACTION_EVENT_BILLS_PLANING_QUEUE, transactionEventDto);
+        if (StringUtils.endsWithIgnoreCase(Category.Type.ASSET.toString(), transactionEventDto.getCategoryName())) {
+            sendRabbitMessage(TRANSACTION_EVENT_ASSETS_MANAGEMENT_QUEUE, transactionEventDto);
+        }
+    }
+
+    private <T> void sendRabbitMessage(final String routingKey, final T rabbitMessage) {
+        rabbitTemplate.convertAndSend(SIMPLE_BILLS_EXCHANGE, routingKey, rabbitMessage);
+        log.info("Message sent: queue={}, message={}", TRANSACTION_EVENT_BILLS_PLANING_QUEUE, rabbitMessage);
     }
 }
