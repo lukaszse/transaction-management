@@ -46,13 +46,9 @@ public class TransactionService {
         return createTransaction(transaction);
     }
 
-    public Mono<Transaction> createTransaction(final Transaction transaction) {
-        return sequentialIdRepository.generateId(transaction.getUser())
-                .map(id -> setTransactionNumber(transaction, id))
-                .map(TransactionService::setCurrentDateIfMissing)
-                .map(VersionedEntityUtils::setMetadata)
-                .flatMap(transactionCrudRepository::save)
-                .doOnSuccess(createdTransaction -> prepareAndSendTransactionEventMessage(createdTransaction, ActionType.CREATION));
+    public Mono<Transaction> updateTransaction(final String username, final Integer transactionNumber, final TransactionDto transactionDto) {
+        final Transaction transaction = toTransaction(username, transactionNumber, transactionDto);
+        return updateTransaction(transaction);
     }
 
     public Mono<Transaction> findTransactionByTransactionNumber(final String username, final Integer transactionNumber) {
@@ -67,30 +63,34 @@ public class TransactionService {
                 .zipWith(countTransactionsByCategory(username, params));
     }
 
-    public Mono<Long> countTransactionsByCategory(final String username, final TransactionQueryParams params) {
-        return transactionSearchRepository.count(username, params);
-    }
-
     public Mono<Transaction> deleteTransactionByTransactionNumber(final String username, final Integer transactionNumber) {
         return transactionCrudRepository.deleteByUserAndTransactionNumber(username, transactionNumber)
                 .doOnSuccess(deletedTransaction -> prepareAndSendTransactionEventMessage(deletedTransaction, ActionType.DELETION))
                 .doOnError(error -> log.error(OPERATION_ERROR_MESSAGE, OperationType.DELETE, transactionNumber, username, error.getMessage()));
     }
 
-    public Mono<Transaction> updateTransaction(final String username, final Integer transactionNumber, final TransactionDto transactionDto) {
-        final Transaction transaction = toTransaction(username, transactionNumber, transactionDto);
-        transaction.setMetadata(null);
-        return findTransactionByTransactionNumber(username, transaction.getTransactionNumber())
-                .zipWith(transactionSearchRepository.updateTransaction(transaction))
-                .doOnSuccess(TransactionTuple -> prepareAndSendTransactionUpdateActionMessage(TransactionTuple.getT1(), TransactionTuple.getT2()))
-                .map(Tuple2::getT2)
-                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(transaction.getTransactionNumber()))));
-    }
-
     public Flux<Transaction> handleCategoryDeletion(final CategoryEventDto categoryEventDto) {
         if (ActionType.DELETION.equals(categoryEventDto.getActionType())) {
             return changeTransactionCategory(categoryEventDto.getUsername(), categoryEventDto.getCategoryName(), categoryEventDto.getReplacementCategoryName());
         } else return Flux.empty();
+    }
+
+    private Mono<Transaction> createTransaction(final Transaction transaction) {
+        return sequentialIdRepository.generateId(transaction.getUser())
+                .map(id -> setTransactionNumber(transaction, id))
+                .map(TransactionService::setCurrentDateIfMissing)
+                .map(VersionedEntityUtils::setMetadata)
+                .flatMap(transactionCrudRepository::save)
+                .doOnSuccess(createdTransaction -> prepareAndSendTransactionEventMessage(createdTransaction, ActionType.CREATION));
+    }
+
+    private Mono<Transaction> updateTransaction(final Transaction transaction) {
+        transaction.setMetadata(null);
+        return findTransactionByTransactionNumber(transaction.getUser(), transaction.getTransactionNumber())
+                .zipWith(transactionSearchRepository.updateTransaction(transaction))
+                .doOnSuccess(TransactionTuple -> prepareAndSendTransactionUpdateActionMessage(TransactionTuple.getT1(), TransactionTuple.getT2()))
+                .map(Tuple2::getT2)
+                .switchIfEmpty(Mono.error(new NotFoundException(NOT_FOUND_ERROR_MESSAGE.formatted(transaction.getTransactionNumber()))));
     }
 
     private Flux<Transaction> changeTransactionCategory(final String username,
@@ -102,6 +102,10 @@ public class TransactionService {
                         updateTransaction(username, transactionWithNewCategory.getTransactionNumber(), transactionWithNewCategory))
                 .doOnNext(updatedTransaction -> log.info("A transaction with transactionNumber={} category changed from {} to {}",
                         updatedTransaction.getTransactionNumber(), oldCategoryName, updatedTransaction.getCategory()));
+    }
+
+    private Mono<Long> countTransactionsByCategory(final String username, final TransactionQueryParams params) {
+        return transactionSearchRepository.count(username, params);
     }
 
     private void prepareAndSendTransactionEventMessage(final Transaction transaction, final ActionType actionType) {

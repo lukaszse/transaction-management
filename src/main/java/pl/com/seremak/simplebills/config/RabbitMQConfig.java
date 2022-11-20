@@ -61,9 +61,4 @@ public class RabbitMQConfig {
     public Queue transactionEventQueue() {
         return new Queue(TRANSACTION_EVENT_QUEUE, false);
     }
-
-    @Bean
-    public Queue transactionCreationRequest() {
-        return new Queue(TRANSACTION_CREATION_REQUEST_QUEUE, false);
-    }
 }
