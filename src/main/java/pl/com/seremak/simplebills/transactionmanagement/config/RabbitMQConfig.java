@@ -46,7 +46,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public DirectExchange createDirectExchange() {
+    public DirectExchange exchange() {
         return new DirectExchange(SIMPLE_BILLS_EXCHANGE);
     }
 
@@ -56,8 +56,13 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue categoryDeletionBillsPlaningQueue() {
+    public Queue categoryDeletionPlaningQueue() {
         return new Queue(CATEGORY_EVENT_SIMPLE_BILLS_QUEUE, false);
+    }
+
+    @Bean
+    public Queue transactionEventPlanningQueue() {
+        return new Queue(TRANSACTION_EVENT_BILLS_PLANING_QUEUE, false);
     }
 
     @Bean
@@ -66,42 +71,37 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue transactionEventBillsPlanningQueue() {
-        return new Queue(TRANSACTION_EVENT_BILLS_PLANING_QUEUE, false);
-    }
-
-    @Bean
-    Binding userCreationSimpleBillsBinding(final Queue transactionEventBillsPlanningQueue,
+    Binding userCreationSimpleBillsBinding(final Queue userCreationSimpleBillsQueue,
                                            final DirectExchange exchange) {
         return BindingBuilder
-                .bind(transactionEventBillsPlanningQueue)
+                .bind(userCreationSimpleBillsQueue)
                 .to(exchange)
                 .with(USER_CREATION_SIMPLE_BILLS_QUEUE);
     }
 
     @Bean
-    Binding categoryDeletionBillsPlaningBinding(final Queue transactionEventBillsPlanningQueue,
-                                                final DirectExchange exchange) {
+    Binding categoryDeletionPlaningBinding(final Queue categoryDeletionPlaningQueue,
+                                           final DirectExchange exchange) {
         return BindingBuilder
-                .bind(transactionEventBillsPlanningQueue)
+                .bind(categoryDeletionPlaningQueue)
                 .to(exchange)
                 .with(CATEGORY_EVENT_SIMPLE_BILLS_QUEUE);
     }
 
     @Bean
-    Binding transactionsEventsBillPlanningBinding(final Queue transactionEventBillsPlanningQueue,
-                                                  final DirectExchange exchange) {
+    Binding transactionsEventsPlanningBinding(final Queue transactionEventPlanningQueue,
+                                              final DirectExchange exchange) {
         return BindingBuilder
-                .bind(transactionEventBillsPlanningQueue)
+                .bind(transactionEventPlanningQueue)
                 .to(exchange)
                 .with(TRANSACTION_EVENT_BILLS_PLANING_QUEUE);
     }
 
     @Bean
-    Binding transactionsEventsAssetsManagementBinding(final Queue transactionEventBillsPlanningQueue,
+    Binding transactionsEventsAssetsManagementBinding(final Queue transactionEventAssetManagementQueue,
                                                       final DirectExchange exchange) {
         return BindingBuilder
-                .bind(transactionEventBillsPlanningQueue)
+                .bind(transactionEventAssetManagementQueue)
                 .to(exchange)
                 .with(TRANSACTION_EVENT_ASSETS_MANAGEMENT_QUEUE);
     }
