@@ -18,4 +18,4 @@ server:
   error:
     include-stacktrace: never
 
-simpleBillsGuiAppUrl: "https://simple-bills-lukaszse.cloud.okteto.net/"
+simple-bills-gui: "https://simple-bills-lukaszse.cloud.okteto.net/"

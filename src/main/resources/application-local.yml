@@ -18,4 +18,4 @@ server:
   error:
     include-stacktrace: never
 
-simpleBillsGuiAppUrl: "http://localhost:8089"
+simple-bills-gui: "http://localhost:8089"
