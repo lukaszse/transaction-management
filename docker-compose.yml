@@ -4,13 +4,3 @@ services:
     ports:
       - 8080:8080
     restart: always
-
-  mongodb:
-    image: mongo:4.4.16
-    ports:
-      - 27027:27027
-    volumes:
-      - data:/mongodb
-
-volumes:
-  data:

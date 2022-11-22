@@ -14,8 +14,4 @@ spring:
           issuer-uri: http://localhost:8085/realms/simple-bills
           jwk-set-uri: http://localhost:8085/realms/simple-bills/protocol/openid-connect/certs
 
-server:
-  error:
-    include-stacktrace: never
-
 simple-bills-gui: "http://localhost:8089"

@@ -14,8 +14,4 @@ spring:
           issuer-uri: https://37.233.102.95:8443/realms/simple-bills
           jwk-set-uri: https://37.233.102.95:8443/realms/simple-bills/protocol/openid-connect/certs
 
-server:
-  error:
-    include-stacktrace: never
-
 simple-bills-gui: "https://simple-bills-lukaszse.cloud.okteto.net/"
