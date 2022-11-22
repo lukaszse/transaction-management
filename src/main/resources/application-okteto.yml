@@ -3,11 +3,11 @@ spring:
     exclude: org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration,org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
   data:
     mongodb:
-      database: simple-bills
+      database: transaction
       uri: mongodb://mongodb:27017
 
 server:
   error:
     include-stacktrace: never
 
-simpleBillsGuiAppUrl: "http://localhost:8089"
+simple-bills-gui: "http://localhost:8089"
